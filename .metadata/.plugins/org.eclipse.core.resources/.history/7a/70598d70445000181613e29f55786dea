@@ -1,0 +1,104 @@
+package com.amaker.wlo;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+
+public class AddDishActivity extends Activity{
+	
+	private static final int SELECT_PHOTO=102;
+	private static final int TAKE_PHOTO=202;
+	
+	private EditText dishNameET,dishTypeEt,dishPriceET,dishRemarkET;
+	private ImageView uploadPicIV;
+	private Button localPhotoBtn,takePhotoBtn,confirmBtn,cancelBtn;
+	private String picPath="";
+	
+	private Intent intent=null;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.admin_add_dish);
+		
+		dishNameET=(EditText)findViewById(R.id.admin_add_dish_name);
+		dishTypeEt=(EditText)findViewById(R.id.admin_add_dish_type);
+		dishPriceET=(EditText)findViewById(R.id.admin_add_dish_price);
+		dishRemarkET=(EditText)findViewById(R.id.admin_add_dish_remark);
+		
+		uploadPicIV=(ImageView)findViewById(R.id.admin_add_dish_upload_iv);
+		
+		localPhotoBtn=(Button)findViewById(R.id.admin_add_dish_upload_pic_btn);
+		localPhotoBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 相册选取
+				intent = new Intent(Intent.ACTION_GET_CONTENT);
+				intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+				startActivityForResult(intent, SELECT_PHOTO);
+			}
+			
+		});
+		
+		takePhotoBtn=(Button)findViewById(R.id.admin_add_dish_take_picture_upload);
+		takePhotoBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 拍照
+				//设置图片的保存路径,作为全局变量
+				Date date=new Date(System.currentTimeMillis());
+				SimpleDateFormat dateFormat=new SimpleDateFormat("'IMG'_yyyyMMddHHmmss");
+				String timeStr=dateFormat.format(date);
+				imageFilePath = Environment.getExternalStorageDirectory().getPath()+"/DCIM/Camera/"+timeStr+".jpg";
+				File temp = new File(imageFilePath);
+				
+				imageFileUri = Uri.fromFile(temp);//获取文件的Uri	
+				intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//跳转到相机Activity
+				intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageFileUri);//告诉相机拍摄完毕输出图片到指定的Uri
+				startActivityForResult(intent, TAKE_PHOTO);
+			}
+			
+		});
+		
+		confirmBtn=(Button)findViewById(R.id.admin_add_dish_comfirm_btn);
+		confirmBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		cancelBtn=(Button)findViewById(R.id.admin_add_dish_cancel_btn);
+		cancelBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+}

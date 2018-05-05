@@ -1,0 +1,5 @@
+package com.amaker.provider;
+
+public class User {
+
+}

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".RegisterActivity" >
+    
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:weightSum="20"
+	    android:orientation="vertical"
+	    android:gravity="center"
+	    >
+	    
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	    <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="10"
+	            android:gravity="center"
+	            android:text="@string/activity_register_title"
+	            android:textSize="25dp"
+	            android:layout_marginRight="5dp"
+	            />
+	    </LinearLayout>
+	    
+	    <!-- 注册账号输入 -->
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	   	    
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3.5"
+	            android:gravity="center"
+	            android:text="@string/activity_register_account"
+	            android:textSize="20dp"
+	            android:layout_marginRight="5dp"
+	            />
+	        
+	        <EditText 
+	            android:id="@+id/register_account"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6.5"
+	            android:inputType="text"
+	            android:textSize="25dp"/>
+	   	</LinearLayout>
+	   	
+	    <!-- 注册昵称输入 -->
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	   	    
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3.5"
+	            android:gravity="center"
+	            android:text="@string/activity_register_username"
+	            android:textSize="20dp"
+	            android:layout_marginRight="5dp"
+	            />
+	        
+	        <EditText 
+	            android:id="@+id/register_nickname"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6.5"
+	            android:inputType="text"
+	            android:textSize="25dp"/>
+	   	</LinearLayout>
+	   	
+	   	<!-- 注册密码输入 -->
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	   	    
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3.5"
+	            android:gravity="center"
+	            android:text="@string/activity_register_password"
+	            android:textSize="20dp"
+	            android:layout_marginRight="5dp"
+	            />
+	        
+	        <EditText 
+	            android:id="@+id/register_password"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6.5"
+	            android:inputType="textPassword"
+	            android:textSize="25dp"/>
+	   	</LinearLayout>
+	   	
+	    <!-- 注册密码再次输入 -->
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	   	    
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3.5"
+	            android:gravity="center"
+	            android:text="@string/activity_register_confirmPsd"
+	            android:textSize="20dp"
+	            android:layout_marginRight="5dp"
+	            />
+	        
+	        <EditText 
+	            android:id="@+id/register_passwordConfirm"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6.5"
+	            android:inputType="textPassword"
+	            android:textSize="25dp"/>
+	   	</LinearLayout>
+	   	
+	    <!-- 注册 重置按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <Button 
+	            android:id="@+id/register_ok_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_register_register"
+	            android:textSize="25dp"
+	            android:onClick="onRegister_Ok"/>
+	        
+	        <Button 
+	            android:id="@+id/register_reset_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_register_reset"
+	            android:textSize="25dp"
+	            android:onClick="onRegister_Reset"/>
+	    </LinearLayout>
+        
+    </LinearLayout>
+
+</LinearLayout>

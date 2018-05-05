@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center" >
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:weightSum="20"
+	    android:orientation="vertical"
+	    android:gravity="center">
+	    
+        <!-- 显示当前所有菜品ListView -->
+        <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+            <ListView 
+	            android:id="@+id/admin_update_dish_show_allDishes"
+	            android:layout_width="match_parent"
+		        android:layout_height="match_parent"
+		        android:layout_margin="8dp"
+		        android:orientation="horizontal"
+		        android:weightSum="10"
+		        android:gravity="center">
+        	</ListView>
+        	
+	    </LinearLayout>
+        
+        
+        <!-- 输入布局，输入需要更新的菜名-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:gravity="center"
+	            android:text="@string/activity_update_dish_name"
+	            android:textSize="10dp"
+	            android:layout_marginRight="2.5dp"/>
+	        
+	        <EditText android:id="@+id/admin_update_dish_name"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="7"
+	            android:inputType="text"
+	            android:textSize="10dp"/>
+	        
+	    </LinearLayout>
+	    
+	    <!-- 输入布局，输入需要更新的价格-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:gravity="center"
+	            android:text="@string/activity_update_dish_price"
+	            android:textSize="10dp"
+	            android:layout_marginRight="2.5dp"
+	            />
+	        
+	        <EditText android:id="@+id/admin_update_dish_price"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="7"
+	            android:inputType="text"
+	            android:textSize="10dp"
+	            />
+	        
+	    </LinearLayout>
+	    
+	    <!-- 输入布局，输入需要更新的菜的备注-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:gravity="center"
+	            android:text="@string/activity_update_dish_remark"
+	            android:textSize="10dp"
+	            android:layout_marginRight="2.5dp"
+	            />
+	        
+	        <EditText android:id="@+id/admin_update_dish_remark"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="7"
+	            android:inputType="text"
+	            android:textSize="10dp"
+	            />
+	        
+	    </LinearLayout>
+        
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,17 @@
+127.0.0.1 - - [04/May/2018:20:11:15 +0800] "GET / HTTP/1.1" 404 951
+127.0.0.1 - - [04/May/2018:20:11:19 +0800] "GET /Wireless_Order_Server/ HTTP/1.1" 200 698
+127.0.0.1 - - [04/May/2018:20:12:30 +0800] "POST /Wireless_Order_Server/servlet/UploadServlet?requestStr=upload HTTP/1.1" 200 133
+192.168.191.1 - - [04/May/2018:20:13:42 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 404 1083
+127.0.0.1 - - [04/May/2018:20:14:06 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 404 1083
+127.0.0.1 - - [04/May/2018:20:14:24 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:23:45 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:24:01 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:24:02 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:24:02 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:24:02 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:24:03 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:24:08 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:24:12 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:27:13 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:27:37 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490
+127.0.0.1 - - [04/May/2018:20:27:38 +0800] "GET /Wireless_Order_Server/uploads/687f0d8d272f6237d795fda538ea0a8d.jpg HTTP/1.1" 200 15490

@@ -1,0 +1,72 @@
+package com.amaker.dao.impl;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.amaker.dao.OrderDao;
+import com.amaker.entity.Dish;
+import com.amaker.entity.Order;
+import com.amaker.util.DBUtil;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.ResultSet;
+import com.mysql.jdbc.Statement;
+
+public class OrderDaoImpl implements OrderDao {
+
+	@Override
+	public List getDishesList() {
+		// 查询sql语句
+		String sql="select id,name,type,price,picture,remark from dishestbl ";
+		// 获得数据库连接工具
+		DBUtil util=new DBUtil();
+		// 获得连接
+		Connection conn=(Connection) util.openConnection();
+		try {
+			// 获得预处理语句
+			Statement stmt=(Statement) conn.createStatement();
+			// 执行查询
+			ResultSet rs=(ResultSet) stmt.executeQuery(sql);
+			// 获得菜品List
+			List list=new ArrayList();
+			while(rs.next()) {
+				// 获得菜品信息
+				int id= rs.getInt(1);
+				String name=rs.getString(2);
+				String type=rs.getString(3);
+				int price=rs.getInt(4);
+				String picture=rs.getString(5);
+				String remark=rs.getString(6);
+				
+				Dish dish=new Dish();
+				dish.setId(id);
+				dish.setName(name);
+				dish.setType(type);
+				dish.setPrice(price);
+				dish.setPicture(picture);
+				dish.setRemark(remark);
+				
+				list.add(dish);
+			}
+			
+			return list;
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			util.closeConnection(conn);
+		}
+		return null;
+	}
+
+	@Override
+	public int saveOrder(Order order) {
+		// TODO Auto-generated method stub
+		// 添加sql语句
+		
+		
+		return 0;
+	}
+
+}

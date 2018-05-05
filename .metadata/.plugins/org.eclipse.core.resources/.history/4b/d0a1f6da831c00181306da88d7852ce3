@@ -1,0 +1,8 @@
+package com.amaker.dao;
+
+//OrderDao的接口
+public class OrderDao {
+	
+	//得到菜单列表
+	public
+}

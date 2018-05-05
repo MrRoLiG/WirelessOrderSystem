@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/gson-2.3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/commons-httpclient-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/mysql-connector-java-5.0.3-bin.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/commons-beanutils.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/commons-collections-3.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/commons-fileupload-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/commons-io-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/commons-lang-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/commons-logging-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/ezmorph-1.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/OneDrive/Code/CollegeOrderSystem/MyServerAndClient/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

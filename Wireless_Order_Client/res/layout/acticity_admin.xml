@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".AdminActivity" >
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:weightSum="20"
+	    android:orientation="vertical"
+	    android:gravity="center">
+        
+        <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	    <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="10"
+	            android:gravity="center"
+	            android:text="@string/activity_admin_title"
+	            android:textSize="25dp"
+	            android:layout_marginRight="5dp"
+	            android:textColor="#000000"
+	            />
+	    </LinearLayout>
+	    
+        <!-- 听单跑马灯提示 -->
+        <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	    
+	    <com.amaker.adapter.MyMarqueeTextView 
+	        	android:id="@+id/admin_listen_order_marquee"
+	            android:layout_width="match_parent"
+	            android:layout_height="match_parent"
+	            android:ellipsize="marquee"
+	            android:focusable="true"  
+	            android:focusableInTouchMode="true"  
+	            android:gravity="center_vertical"  
+	            android:marqueeRepeatLimit="marquee_forever"  
+	            android:scrollHorizontally="true"  
+	            android:singleLine="true" 
+	            android:textColor="#000000"
+	            />
+	    </LinearLayout>
+        
+        <!-- 听单详情跑马灯提示 -->
+        <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	    <com.amaker.adapter.MyMarqueeTextView 
+	        	android:id="@+id/admin_listen_order_detail_marquee"
+	            android:layout_width="match_parent"
+	            android:layout_height="match_parent"
+	            android:ellipsize="marquee"
+	            android:focusable="true"  
+	            android:focusableInTouchMode="true"  
+	            android:gravity="center_vertical"  
+	            android:marqueeRepeatLimit="marquee_forever"  
+	            android:scrollHorizontally="true"  
+	            android:singleLine="true" 
+	            android:textColor="#000000"
+	            />
+	    </LinearLayout>
+        
+        <!-- 用户管理 包括添加用户和删除用户按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2"
+	            android:gravity="left|center"
+	            android:text="@string/activity_admin_userManagement"
+	            android:textSize="12dp"
+	            android:textColor="#000000"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_add_user_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_admin_add_user"
+	            android:textSize="20dp"
+	            android:textColor="#000000"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_delete_user_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_admin_delete_user"
+	            android:textSize="20dp"
+	            android:textColor="#000000"/>
+	    </LinearLayout>
+	    
+	    <!-- 菜品管理 包括添加菜品和删除菜品以及更新菜品按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2"
+	            android:gravity="left|center"
+	            android:text="@string/activity_admin_dishManagement"
+	            android:textSize="12dp"
+	            android:textColor="#000000"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_add_dish_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2.5"
+	            android:text="@string/activity_admin_add_dish"
+	            android:textSize="12dp"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_delete_dish_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2.5"
+	            android:text="@string/activity_admin_delete_dish"
+	            android:textSize="12dp"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_update_dish_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2.5"
+	            android:text="@string/activity_admin_update_dish"
+	            android:textSize="12dp"/>
+	    </LinearLayout>
+        
+	    <!-- 其他管理项 包括开始上菜和清订单按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2"
+	            android:gravity="start|center"
+	            android:text="@string/activity_admin_otherManagement"
+	            android:textSize="12dp"
+	            android:textColor="#000000"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_listen_order_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2.5"
+	            android:text="@string/activity_admin_listen_order"
+	            android:textSize="12dp"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_dish_up_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2.5"
+	            android:text="@string/activity_admin_dish_up"
+	            android:textSize="12dp"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_order_is_done_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2.5"
+	            android:text="@string/activity_admin_order_is_done"
+	            android:textSize="12dp"/>
+	        
+	    </LinearLayout>
+	    
+	    <!-- 清桌和注销  -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <Button 
+	            android:id="@+id/admin_clear_table_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_admin_clear_table"
+	            android:textSize="20dp"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_logout_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_admin_logout"
+	            android:textSize="20dp"/>
+	        
+	    </LinearLayout>
+	    
+    </LinearLayout>
+
+</LinearLayout>

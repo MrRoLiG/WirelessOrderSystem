@@ -1,0 +1,10 @@
+package com.amaker.entity;
+
+//用于封装dishestbl表的实体类
+public class Dish {
+	private int id;
+	private String name;
+	private String type;
+	private int price;
+	
+}

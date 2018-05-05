@@ -1,0 +1,41 @@
+package com.amaker.servlet;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.amaker.dao.OrderDao;
+import com.amaker.dao.impl.OrderDaoImpl;
+import com.amaker.util.DBUtil;
+
+public class OrderDishesServlet extends HttpServlet{
+	private static final long serialVersionUID = 1L;
+	
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		OrderDao dao=new OrderDaoImpl();
+		// 获得菜品列表
+		List list=dao.getDishesList();
+		response.setContentType("text/json;charset=UTF-8");
+		PrintWriter out=response.getWriter();
+		
+		// 转换成字符串
+		String msg=DBUtil.buildJson(list);
+		// 返回给客户端
+		out.print(msg);
+		out.flush();
+		out.close();
+	}
+	
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request,response);
+	}
+
+}

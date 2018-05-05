@@ -1,0 +1,218 @@
+package com.amaker.wlo;
+
+import com.amaker.util.HttpUtil;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+public class AdminActivity extends Activity{
+	
+	private Button userAddBtn,userDeleteBtn,dishAddBtn,dishDeleteBtn,dishUpdateBtn,clearTableBtn,clearOrderBtn,logoutBtn;
+	// 服务器请求字符串，服务端根据客户端发送的请求字符串对应回应客户端
+	private static String szAdminRequestStr=null;
+	private static String szQueryStr=null;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.acticity_admin);
+		// 获得各个按钮
+		userAddBtn=(Button) findViewById(R.id.admin_add_user_btn);
+		userDeleteBtn=(Button) findViewById(R.id.admin_delete_user_btn);
+		dishAddBtn=(Button) findViewById(R.id.admin_add_dish_btn);
+		dishDeleteBtn=(Button) findViewById(R.id.admin_delete_dish_btn);
+		dishUpdateBtn=(Button) findViewById(R.id.admin_update_dish_btn);
+		clearTableBtn=(Button) findViewById(R.id.admin_clear_table_btn);
+		clearOrderBtn=(Button) findViewById(R.id.admin_clear_order_btn);
+		logoutBtn=(Button) findViewById(R.id.admin_logout_btn);
+		
+		// 为各个按钮添加点击事件
+		userAddBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="userAddReq";
+				getAddUserQuery();
+			}
+			
+		});
+		userDeleteBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="userDeleteReq";
+			}
+			
+		});
+		dishAddBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="dishAddReq";
+			}
+			
+		});
+		dishDeleteBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="dishDeleteReq";
+			}
+			
+		});
+		dishUpdateBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="dishUpdateReq";
+			}
+			
+		});
+		clearTableBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="clearTableReq";
+			}
+			
+		});
+		clearOrderBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="clearOrderReq";
+			}
+			
+		});
+		
+		// 开启一个子线程进行服务器访问
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// 访问服务器url
+				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr;
+				// 获得访问结果
+				String result=HttpUtil.queryStringForPost(url);
+				
+				Message msg = new Message();
+		        Bundle data = new Bundle();
+		        data.putString("value", result);
+		        msg.setData(data);
+		        adminHandler.sendMessage(msg);
+			}
+			
+		}).start();
+		
+		logoutBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 调用注销方法
+				logout();
+			}
+			
+		});
+	}
+	
+	
+	private void getAddUserQuery() {
+		final String[] genders= {"男","女"};
+		final String[] gendersVal= {"1","0"}; 
+		final String[] permissions= {"普通用户","管理员"};
+		final int[] permissionVal= {2,1};
+		
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_add_user, null);
+		// 获得各个布局实例
+		final EditText nameET=(EditText) v.findViewById(R.id.admin_add_user_name);
+		final EditText accountET=(EditText) v.findViewById(R.id.admin_add_user_account);
+		final EditText passwordET=(EditText) v.findViewById(R.id.admin_add_user_password);
+		final EditText remarkET=(EditText) v.findViewById(R.id.admin_add_user_remark);
+		final Spinner genderSP=(Spinner) v.findViewById(R.id.admin_add_user_gender);
+		final Spinner permissionSP=(Spinner) v.findViewById(R.id.admin_add_user_permission);
+		
+		String name=nameET.getText().toString().trim();
+		String account=accountET.getText().toString().trim();
+		String password=passwordET.getText().toString().trim();
+		String remark=remarkET.getText().toString().trim();
+		
+		szQueryStr="&name="+name+"&account="+account+"&password="+password;
+		
+		String gender="1";
+		int permission=2;
+		
+		ArrayAdapter<String> genderAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,genders);
+		genderSP.setAdapter(genderAdapter);
+		genderSP.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				szQueryStr += ("&gender=" + gendersVal[position]);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				szQueryStr += ("&gender=1");
+			}
+			
+		});
+		
+		ArrayAdapter<String> permissionAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,permissions);
+		permissionSP.setAdapter(permissionAdapter);
+		permissionSP.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				szQueryStr += ("&permission=" + permissionVal[position]);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				szQueryStr += ("&permission=2 ");
+			}
+			
+		});
+		
+		
+	}
+	
+	Handler adminHandler=new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+		super.handleMessage(msg);
+        Bundle data = msg.getData();
+        String temp = data.getString("value").toString();
+        
+        // 显示结算结果
+		Toast.makeText(AdminActivity.this, temp, Toast.LENGTH_LONG).show();
+		};
+	};
+	
+	// 注销方法
+	private void logout() {
+		
+	}
+}

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:gravity="center"
+    tools:context=".OrderActivity" >
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:weightSum="20"
+	    android:orientation="vertical"
+	    android:gravity="center" >
+
+        <!-- 菜品选择下拉列表 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center" >
+
+            <TextView
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:gravity="center"
+	            android:text="@string/activity_add_dishes_choose_dish"
+	            android:textSize="20dp"
+	            android:layout_marginRight="2.5dp"
+            />    
+            
+            <Spinner 
+                android:id="@+id/choose_dishes_spinner"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6"
+	            android:gravity="center"
+	           	/>
+        </LinearLayout>
+        
+        <!-- 菜品数量 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center" >
+            
+            <TextView
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:gravity="center"
+	            android:text="@string/activity_add_dishes_dish_number"
+	            android:textSize="20dp"
+	            android:layout_marginRight="2.5dp"
+            />
+            
+            <EditText
+                android:id="@+id/choosed_dish_number"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6"
+	            android:inputType="text"
+	            android:textSize="25dp"
+	            android:textColor="#000000"
+            />
+		</LinearLayout>
+		
+        <!-- 备注信息 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center" >
+            
+            <TextView
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:gravity="center"
+	            android:text="@string/activity_add_dishes_dish_remark"
+	            android:textSize="20dp"
+	            android:layout_marginRight="2.5dp"
+            />
+            
+            <EditText
+                android:id="@+id/choose_dishes_remark"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6"
+	            android:inputType="text"
+	            android:textSize="25dp"
+	            android:textColor="#000000"
+            />
+		</LinearLayout>
+		
+        <!-- 显示所点菜品信息 -->
+        <LinearLayout 
+            android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+            
+            <!-- 显示菜品的图片 -->
+            <LinearLayout 
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:gravity="center">
+                
+                <ImageView
+                    android:id="@+id/dishes_info_image_iv"
+                    android:layout_width="match_parent"
+	            	android:layout_height="match_parent"
+	            	android:scaleType="fitCenter"
+	            	/>
+                
+            </LinearLayout>
+            
+            <LinearLayout 
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="1"
+	            android:orientation="vertical"
+	        	android:weightSum="10"
+	            android:gravity="center">
+            </LinearLayout>
+            
+            <!-- 显示菜品的相关信息 -->
+            <LinearLayout 
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="5"
+	            android:orientation="vertical"
+	        	android:weightSum="10"
+	            android:gravity="center">
+                
+                <!-- 菜名信息 -->
+                <TextView
+					android:id="@+id/dishes_info_name_tv"
+					android:layout_width="match_parent"
+					android:layout_height="0dp"
+					android:layout_weight="2"
+					android:gravity="start|center"
+					android:textSize="15dp"
+				/>
+                <!-- 菜品价格信息 -->
+                <TextView
+					android:id="@+id/dishes_info_price_tv"
+					android:layout_width="match_parent"
+					android:layout_height="0dp"
+					android:layout_weight="2"
+					android:gravity="start|center"
+					android:textSize="15dp"
+				/>
+                <!-- 菜品菜系信息 -->
+                <TextView
+					android:id="@+id/dishes_info_type_tv"
+					android:layout_width="match_parent"
+					android:layout_height="0dp"
+					android:layout_weight="2"
+					android:gravity="start|center"
+					android:textSize="15dp"
+				/>
+                <!-- 菜品备注信息 -->
+                <TextView
+					android:id="@+id/dishes_info_remark_tv"
+					android:layout_width="match_parent"
+					android:layout_height="0dp"
+					android:layout_weight="4"
+					android:gravity="start|center"
+					android:textSize="15dp"
+				/>
+            </LinearLayout>
+            
+        </LinearLayout>
+		
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,5 @@
+package com.amaker.dao;
+
+public class OrderDao {
+
+}

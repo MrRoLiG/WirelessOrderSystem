@@ -1,0 +1,413 @@
+package com.amaker.wlo;
+
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.amaker.util.CheckDish;
+import com.amaker.util.CheckTable;
+import com.amaker.util.HttpUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class OrderActivity extends Activity {
+	
+	private Spinner tableNoSpinner;
+	private Button confirmDealBtn;
+	private Button startATableBtn;
+	private Button addDishesBtn;
+	private EditText tableNoCustNumET;
+	private EditText remarkET;
+	
+	private Spinner menuSpinner;
+	private EditText dishesNumET;
+	private EditText dishRemarkET;
+	private TextView dishInfoTV;
+	
+	private ArrayList<Integer> tableDataList=new ArrayList<Integer>();
+	private ArrayAdapter<Integer> arrTableAdapter;
+	private ArrayList<String> dishDataList=new ArrayList<String>();
+	private ArrayAdapter<String> arrDishAdapter;
+ 	
+	private ArrayList<CheckTable> checkTableList=new ArrayList<CheckTable>();
+	private ArrayList<CheckDish> checkDishList=new ArrayList<CheckDish>();
+	
+	UrlEncodedFormEntity entity=null;
+	// 开桌生成的订单id
+	private String szOrderId;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_order);
+		
+		confirmDealBtn=(Button)findViewById(R.id.order_confirmDeal_btn);
+		startATableBtn=(Button)findViewById(R.id.order_startATable_btn);
+		addDishesBtn=(Button)findViewById(R.id.order_addDishes_btn);
+		tableNoCustNumET=(EditText)findViewById(R.id.order_tableNo_customerNumber);
+		remarkET=(EditText)findViewById(R.id.order_remark);
+		
+		// 为确定下单按钮添加点击事件
+		confirmDealBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		// 为添菜按钮添加点击事件
+		addDishesBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 调用点菜方法
+				addDishes();
+			}
+			
+		});
+		
+		// 为开桌按钮添加点击事件
+		startATableBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 获取开桌时间
+				Date date=new Date();
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+				String orderDate=sdf.format(date);
+				// 获取开桌用户
+				SharedPreferences sharedPre = getSharedPreferences("config", MODE_PRIVATE);
+				int intUserId = sharedPre.getInt("id", 0);
+				String userId=intUserId+"";
+				// 获取桌号
+				TextView tv = (TextView) tableNoSpinner.getSelectedView();
+				String tableId = tv.getText().toString().trim();
+				// 获取顾客人数
+				String customerNum=tableNoCustNumET.getText().toString();
+				
+				// 请求参数列表
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				// 添加请求参数
+				params.add(new BasicNameValuePair("userid",userId));
+				params.add(new BasicNameValuePair("tableid",tableId));
+				params.add(new BasicNameValuePair("customernum",customerNum));
+				params.add(new BasicNameValuePair("orderdate",orderDate));
+				
+				try {
+					entity=new UrlEncodedFormEntity(params,HTTP.UTF_8);
+				}
+				catch(UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+				
+				// 开启一个子线程请求服务器
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						// 请求服务器url
+						String url = HttpUtil.BASE_URL+"servlet/StartTableServlet";
+						// 获得请求对象HttpPost
+						HttpPost request = HttpUtil.getHttpPost(url);
+						// 设置查询参数
+						request.setEntity(entity);
+						// 获得响应结果
+						String result= HttpUtil.queryStringForPost(request);
+						szOrderId=result;
+						
+						Message msg = new Message();
+				        Bundle data = new Bundle();
+				        data.putString("value", szOrderId.toString());
+				        msg.setData(data);
+				        orderSTHandler.sendMessage(msg);
+					}
+					
+				}).start();
+			}
+			
+		});
+		
+		tableNoSpinner=(Spinner)findViewById(R.id.order_tableNo_spinner);
+		setTableAdapter();
+		
+		tableNoSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				//	showDialog("Selected!");
+				int sId=tableDataList.get(position);
+				int sFlag=getTableFlagById(sId);
+				confirmDealBtn.setEnabled(true);
+				if(-1==sFlag) {
+					showDialog("该桌号不存在!");
+				}
+				else{
+					if(0==sFlag) {
+						startATableBtn.setEnabled(true);
+						tableNoCustNumET.setText("0");
+						remarkET.setText("无");
+						setEditTextReadOnly(tableNoCustNumET,true);
+						setEditTextReadOnly(remarkET,true);
+					}
+					if(1==sFlag) {
+						startATableBtn.setEnabled(false);
+						tableNoCustNumET.setText(getNumById(sId)+"");
+						remarkET.setText(getRemarkById(sId));
+						setEditTextReadOnly(tableNoCustNumET,false);
+						setEditTextReadOnly(remarkET,false);
+					}
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// showDialog("NotSelected!");
+			}
+			
+		});
+
+	}
+	
+	// 为桌子号Spinner绑定Adapter
+	private void setTableAdapter() {
+
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					// 访问服务器url
+					String url=HttpUtil.BASE_URL+"servlet/CheckTableServlet";
+					// 查询返回结果
+					String result=(HttpUtil.queryStringForPost(url)).toString();
+					
+					JsonParser parser=new JsonParser();
+					JsonArray jsonArr=parser.parse(result).getAsJsonArray();		
+					Gson gson=new Gson();
+					
+					for(JsonElement jsonTable:jsonArr) {
+						CheckTable checkTable=gson.fromJson(jsonTable, CheckTable.class);
+						checkTableList.add(checkTable);
+					}
+					for(int i=0;i<checkTableList.size();i++) {
+						int id=checkTableList.get(i).getId();
+						tableDataList.add(id);
+					}
+					
+					Message msg = new Message();
+			        Bundle data = new Bundle();
+			        data.putString("value", tableDataList.toString());
+			        msg.setData(data);
+			        orderHandler.sendMessage(msg);
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}).start();
+	}
+
+	// 点菜方法
+	private void addDishes() {
+		
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 实例化需要在对话框中添加的视图
+		final View v=inflater.inflate(R.layout.activity_add_dishes, null);
+		// 获得视图中的Spinner对象
+		menuSpinner = (Spinner) v.findViewById(R.id.choose_dishes_spinner);
+		// 获得视图中的EditText数量对象
+		dishesNumET=(EditText) v.findViewById(R.id.choosed_dish_number);
+		// 获得视图中的EditText备注对象
+		dishRemarkET=(EditText) v.findViewById(R.id.choose_dishes_remark);
+		// 获得视图中的TextView对象用来展示所选菜品信息
+		dishInfoTV=(TextView) v.findViewById(R.id.dishse_info_tv);
+		
+		// 开启一个子线程来请求服务器得到菜品信息
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					// 访问服务器url
+					String url=HttpUtil.BASE_URL+"servlet/OrderDishesServlet";
+					// 查询返回结果
+					String result=(HttpUtil.queryStringForPost(url)).toString();
+					
+					JsonParser parser=new JsonParser();
+					JsonArray jsonArr=parser.parse(result).getAsJsonArray();		
+					Gson gson=new Gson();
+					
+					for(JsonElement jsonDish:jsonArr) {
+						CheckDish checkDish=gson.fromJson(jsonDish, CheckDish.class);
+						checkDishList.add(checkDish);
+					}
+					for(int i=0;i<checkDishList.size();i++) {
+						String name=checkDishList.get(i).getName();
+						dishDataList.add(name);
+					}
+					
+					Message msg = new Message();
+			        Bundle data = new Bundle();
+			        data.putString("value", dishDataList.toString());
+			        msg.setData(data);
+			        addDishHandler.sendMessage(msg);
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}).start();
+		
+		menuSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				// TODO Auto-generated method stub
+				// 当选中一项菜品的时候，关于改菜品的相关信息会显示在视图中
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// DO NOTHING 不做处理
+			}
+			
+		});
+	}
+	
+	Handler orderHandler=new Handler() {
+		@Override
+	    public void handleMessage(Message msg) {
+	        super.handleMessage(msg);
+	        Bundle data = msg.getData();
+	        String temp = data.getString("value").toString();
+	        String str=temp.substring(1,temp.length()-1);
+	        ArrayList val = new ArrayList(Arrays.asList(str.split(",")));
+	        
+	        arrTableAdapter=new ArrayAdapter<Integer>(OrderActivity.this,android.R.layout.simple_spinner_item,val);
+	        arrTableAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			tableNoSpinner.setAdapter(arrTableAdapter);
+	    }
+	};
+	Handler orderSTHandler=new Handler() {
+		@Override
+	    public void handleMessage(Message msg) {
+	        super.handleMessage(msg);
+	        Bundle data = msg.getData();
+	        String temp = data.getString("value").toString();
+
+			showDialog("订单号："+temp.toString());
+			startATableBtn.setEnabled(false);
+	    }
+	};
+	Handler addDishHandler=new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+	        Bundle data = msg.getData();
+	        String temp = data.getString("value").toString();
+	        String str=temp.substring(1,temp.length()-1);
+	        ArrayList val = new ArrayList(Arrays.asList(str.split(",")));
+	        
+	        arrDishAdapter=new ArrayAdapter<String>(OrderActivity.this,android.R.layout.simple_spinner_item,val);
+	        arrDishAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	        menuSpinner.setAdapter(arrDishAdapter);
+		};
+	};
+	
+	
+	// 通过桌子id获取桌子的状态
+	private int getTableFlagById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getFlag();
+			}
+		}
+		return -1;
+	}
+	// 通过桌子id获取桌子人数
+	private int getNumById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getCustomerNum();
+			}
+		}
+		return 0;
+	}
+	// 通过桌子号获取桌子的remark
+	private String getRemarkById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getRemark();
+			}
+		}
+		return "无";
+	}
+	
+	//通过菜品名得到菜品id
+	private void getDishIdByName(String name) {
+		for(int i=0;i<checkDishList.size();i++) {
+			if(name.equals(checkDishList.get(i).getName())) {
+				return checkDishList.get(i).getId();
+			}
+		}
+	}
+	
+	// 设置输入框只读
+	public void setEditTextReadOnly(TextView view,boolean isReadOnly){ 
+      if (view instanceof android.widget.EditText){    
+          view.setCursorVisible(isReadOnly);      //设置输入框中的光标不可见    
+          view.setFocusable(isReadOnly);           //无焦点    
+          view.setFocusableInTouchMode(isReadOnly);     //触摸时也得不到焦点    
+      }    
+	}  
+	//显示对话框函数
+	private void showDialog(String msg){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(msg)
+		       .setCancelable(false)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+}

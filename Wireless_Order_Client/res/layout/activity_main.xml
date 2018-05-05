@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+    
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:weightSum="20"
+	    android:orientation="vertical"
+	    android:gravity="center"
+	    >
+        
+        <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	    <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="10"
+	            android:gravity="center"
+	            android:text="@string/activity_main_title"
+	            android:textSize="25dp"
+	            android:layout_marginRight="5dp"
+	            />
+	    </LinearLayout>
+	    
+        <!-- 提示信息跑马灯 -->
+        <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	    
+            <com.amaker.adapter.MyMarqueeTextView
+                android:id="@+id/activity_main_msg_marquee"
+                android:layout_width="match_parent"
+	        	android:layout_height="match_parent"
+	        	android:ellipsize="marquee"
+	            android:focusable="true"  
+	            android:focusableInTouchMode="true"  
+	            android:gravity="center_vertical"  
+	            android:marqueeRepeatLimit="marquee_forever"  
+	            android:scrollHorizontally="true"  
+	            android:singleLine="true" 
+	            android:textColor="#000000"/>
+            
+	    </LinearLayout>
+        
+        <!-- 点菜 并台按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <Button 
+	            android:id="@+id/main_order_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_main_order"
+	            android:textSize="25dp"/>
+	        
+	        <Button 
+	            android:id="@+id/main_combine_table_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_main_union_table"
+	            android:textSize="25dp"/>
+	    </LinearLayout>
+	    
+	    <!-- 转台 查台按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <Button 
+	            android:id="@+id/main_change_table_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_main_change_table"
+	            android:textSize="25dp"/>
+	        
+	        <Button 
+	            android:id="@+id/main_check_table_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_main_check_table"
+	            android:textSize="25dp"/>
+	    </LinearLayout>
+	    
+	    <!-- 结台 注销按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <Button 
+	            android:id="@+id/main_deal_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_main_pay_table"
+	            android:textSize="25dp"/>
+	        
+	        <Button 
+	            android:id="@+id/main_logoff_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_main_exit"
+	            android:textSize="25dp"/>
+	    </LinearLayout>
+        
+	</LinearLayout>
+
+</LinearLayout>

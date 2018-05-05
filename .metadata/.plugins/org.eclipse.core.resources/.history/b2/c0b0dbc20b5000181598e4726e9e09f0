@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- Activity/Strings -->
+    <string name="app_name">无线点餐系统</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="login">登录界面</string>
+	<string name="register">注册界面</string>
+	<string name="main">主界面</string>
+	<string name="order">点菜界面</string>
+	<string name="checktable">查桌界面</string>
+	<string name="pay">订单详情界面</string>
+	<string name="admin">管理员界面</string>
+	
+	<!-- activity_admin.xml -->
+	<string name="activity_admin_title">管理界面</string>
+	<string name="activity_admin_userManagement">用户管理:</string>
+	<string name="activity_admin_add_user">添加用户</string>
+	<string name="activity_admin_delete_user">删除用户</string>
+	<string name="activity_admin_dishManagement">菜品管理:</string>
+	<string name="activity_admin_add_dish">添加菜品</string>
+	<string name="activity_admin_delete_dish">删除菜品</string>
+	<string name="activity_admin_update_dish">更新用户</string>
+	<string name="activity_admin_otherManagement">其他管理:</string>
+	<string name="activity_admin_dish_up">上菜</string>
+	<string name="activity_admin_listen_order">听单</string>
+	<string name="activity_admin_order_is_done">结单</string>
+	<string name="activity_admin_clear_table">清桌</string>
+	<string name="activity_admin_logout">注销</string>
+	
+	<!-- activity_add_dishes.xml -->
+	<string name="activity_add_dishes_choose_dish">选菜：</string>
+	<string name="activity_add_dishes_dish_number">数量：</string>
+	<string name="activity_add_dishes_dish_remark">备注：</string>
+	
+	<!-- activity_change_table.xml -->
+	<string name="activity_change_table_current_orderid">当前订单号：</string>
+	<string name="activity_change_table_current_tableid">当前桌子号：</string>
+	<string name="activity_change_table_change_tableid">更换桌子号：</string>
+	
+	<!-- activity_login.xml -->
+	<string name="activity_login_title">登录界面</string>
+	<string name="activity_login_account">账号：</string>
+	<string name="activity_login_password">密码：</string>
+	<string name="activity_login_login">登录</string>
+	<string name="activity_login_reset">重置</string>
+	<string name="activity_login_register">注册</string>
+	<string name="activity_login_exit">退出</string>
+	<string name="account_hint">请输入账号</string>
+	<string name="password_hint">请输入密码</string>
+	
+	<!-- activity_main.xml -->
+	<string name="activity_main_title">主界面</string>
+	<string name="activity_main_order">点菜</string>
+	<string name="activity_main_union_table">并台</string>
+	<string name="activity_main_change_table">转台</string>
+	<string name="activity_main_check_table">查台</string>
+	<string name="activity_main_pay_table">查单</string>
+	<string name="activity_main_exit">注销</string>
+	
+	<!-- activity_order.xml -->
+	<string name="activity_order_tableid">桌子号：</string>
+	<string name="activity_order_customer_number">人数：</string>
+	<string name="activity_order_remark">备注：</string>
+	<string name="activity_order_start_table">开桌</string>
+	<string name="activity_order_add_dish">添菜</string>
+	<string name="activity_order_confirm_deal">下单</string>
+	
+	<!-- activity_pay.xml -->
+	<string name="activity_pay_current_orderid">当前订单号：</string>
+	<string name="activity_pay_pay">确认订单</string>
+	<string name="activity_pay_cancel">取消</string>
+	<string name="activity_pay_orderid">单号</string>
+	<string name="activity_pay_username">下单人</string>
+	<string name="activity_pay_tableid">桌号</string>
+	<string name="activity_pay_customer_number">人数</string>
+	<string name="activity_pay_order_date">下单时间</string>
+	<string name="activity_pay_order_totalcost">总花费：</string>
+	
+	<!-- activity_register.xml -->
+	<string name="activity_register_title">注册界面</string>
+	<string name="activity_register_account">账号：</string>
+	<string name="activity_register_username">用户名：</string>
+	<string name="activity_register_password">密码：</string>
+	<string name="activity_register_confirmPsd">确认密码：</string>
+	<string name="activity_register_register">注册</string>
+	<string name="activity_register_reset">重置</string>
+	
+	<!-- activity_union_table.xml -->
+	<string name="activity_union_table_current_orderid">当前订单号：</string>
+	<string name="activity_union_table_current_tableid">当前桌子号：</string>
+	<string name="activity_union_table_target_tableid">目标桌子号：</string>
+	
+	<!-- activity_add_dish.xml -->
+	<string name="activity_add_dish_name">菜名：</string>
+	<string name="activity_add_dish_type">菜系：</string>
+	<string name="activity_add_dish_price">价格：</string>
+	<string name="activity_add_dish_picture">图片：</string>
+	<string name="activity_add_dish_upload_pic">本地</string>
+	<string name="activity_add_dish_take_picture_upload">拍照</string>
+	<string name="activity_add_dish_remark">备注：</string>
+	
+	<!-- activity_add_user.xml -->
+	<string name="activity_add_user_username">用户名：</string>
+	<string name="activity_add_user_account">账号：</string>
+	<string name="activity_add_user_password">密码：</string>
+	<string name="activity_add_user_gender">性别：</string>
+	<string name="activity_add_user_permission">权限：</string>
+	<string name="activity_add_user_remark">备注信息：</string>
+	
+	<!-- activity_delete_dish.xml -->
+	<string name="activity_delete_dish_name">删除菜名：</string>
+	
+	<!-- activity_delete_user.xml -->
+	<string name="activity_delete_user_name">删除用户名：</string>
+	
+	<!-- activity_dish_up.xml -->
+	<string name="activity_dish_up_tableid">上菜订单号：</string>
+	
+	<!-- activity_update_dish.xml -->
+	<string name="activity_update_dish_name">更新菜号：</string>
+	<string name="activity_update_dish_price">更新菜价格：</string>
+	<string name="activity_update_dish_remark">更新菜介绍：</string>
+	
+	<!-- activity_clear_table.xml -->
+	<string name="activity_clear_table_tableid">请输入需要清理的桌子号：</string>
+	
+	<!-- activity_dish_is_done.xml -->
+	<string name="activity_dish_is_done_orderid">请输入需要完成订单的订单号：</string>
+	
+</resources>

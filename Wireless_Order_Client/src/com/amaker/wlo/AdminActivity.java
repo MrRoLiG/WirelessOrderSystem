@@ -1,0 +1,913 @@
+package com.amaker.wlo;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.amaker.adapter.MyAdminDishAdapter;
+import com.amaker.adapter.MyAdminOrderDetailAdapter;
+import com.amaker.adapter.MyAdminUserAdapter;
+import com.amaker.adapter.MyMarqueeTextView;
+import com.amaker.provider.DishUpOrders;
+import com.amaker.provider.Dishes;
+import com.amaker.provider.User;
+import com.amaker.util.HttpUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class AdminActivity extends Activity{
+	
+	private Button userAddBtn,userDeleteBtn,dishAddBtn,dishDeleteBtn,dishUpdateBtn,clearTableBtn,dishUpBtn,idDoneBtn,listenOrderBtn,logoutBtn;
+	private MyMarqueeTextView orderMarqueeET;
+	private MyMarqueeTextView orderDetailMarqueeET;
+	
+	// 定义一个全局表用来存储服务器回传的上菜订单详情
+	private List<DishUpOrders> dishUpOrdersList;
+	
+	// 服务器请求字符串，服务端根据客户端发送的请求字符串对应回应客户端
+	private static String szAdminRequestStr="";
+	private static String szQueryStr="";
+
+	// 用于管理端添加用户
+	private static String szGenderSpinnerStr="";
+	private static String szPermissionSpinnerStr="";
+	
+	// 查询的所有用户信息json字符串
+	private String szCheckUsersStr="";
+	private String szCheckDishesStr="";
+	private String szCheckOrdersStr="";
+	
+	private Context mContext;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		mContext = getApplicationContext();
+		
+		setContentView(R.layout.acticity_admin);
+		// 获得各个按钮
+		userAddBtn=(Button) findViewById(R.id.admin_add_user_btn);
+		userDeleteBtn=(Button) findViewById(R.id.admin_delete_user_btn);
+		dishAddBtn=(Button) findViewById(R.id.admin_add_dish_btn);
+		dishDeleteBtn=(Button) findViewById(R.id.admin_delete_dish_btn);
+		dishUpdateBtn=(Button) findViewById(R.id.admin_update_dish_btn);
+		clearTableBtn=(Button) findViewById(R.id.admin_clear_table_btn);
+		idDoneBtn=(Button) findViewById(R.id.admin_order_is_done_btn);
+		listenOrderBtn=(Button) findViewById(R.id.admin_listen_order_btn);
+		dishUpBtn=(Button) findViewById(R.id.admin_dish_up_btn);
+		logoutBtn=(Button) findViewById(R.id.admin_logout_btn);
+		
+		orderMarqueeET=(MyMarqueeTextView) findViewById(R.id.admin_listen_order_marquee);
+		orderDetailMarqueeET=(MyMarqueeTextView) findViewById(R.id.admin_listen_order_detail_marquee);
+		
+		// 为各个按钮添加点击事件
+		userAddBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="userAddReq";
+				getAddUserQuery();
+			}
+			
+		});
+		userDeleteBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="userDeleteReq";
+				getAllUsers();
+				getDeleteUserQuery();
+			}
+			
+		});
+		dishAddBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				//szAdminRequestStr="dishAddReq";
+				//getAddDishQuery();
+				Intent intent = new Intent(AdminActivity.this,AddDishActivity.class);
+				startActivity(intent);
+			}
+			
+		});
+		dishDeleteBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="dishDeleteReq";
+				getAllDishes();
+				getDeleteDishQuery();
+			}
+			
+		});
+		dishUpdateBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="dishUpdateReq";
+				getAllDishes();
+				getUpdateDishesQuery();
+			}
+			
+		});
+		dishUpBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="dishUpReq";
+				getAllPaidOrder();
+				getDishUpQuery();
+			}
+			
+		});
+		idDoneBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="isDoneReq";
+				getIsDoneQuery();
+			}
+			
+		});
+		clearTableBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="clearTableReq";
+				getClearTableQuery();
+			}
+			
+		});
+		// 点击听单之后，访问服务器查询数据库看当前是否有订单完成下单，如果有订单下单，服务器回传订单信息，客户端以跑马灯信息显示提示出菜
+		listenOrderBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 为请求字符串赋值
+				szAdminRequestStr="listenOrderReq";
+				getListenOrderQuery();
+			}
+			
+		});
+		logoutBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 调用注销方法
+				logout();
+			}
+			
+		});
+	}
+
+	
+	private void getAddUserQuery() {
+		final String[] genders= {"男","女"};
+		final String[] gendersVal= {"1","0"}; 
+		final String[] permissions= {"普通用户","管理员"};
+		final int[] permissionVal= {2,1};
+		
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_add_user, null);
+		// 获得各个布局实例
+		final EditText nameET=(EditText) v.findViewById(R.id.admin_add_user_name);
+		final EditText accountET=(EditText) v.findViewById(R.id.admin_add_user_account);
+		final EditText passwordET=(EditText) v.findViewById(R.id.admin_add_user_password);
+		final EditText remarkET=(EditText) v.findViewById(R.id.admin_add_user_remark);
+		final Spinner genderSP=(Spinner) v.findViewById(R.id.admin_add_user_gender);
+		final Spinner permissionSP=(Spinner) v.findViewById(R.id.admin_add_user_permission);
+
+		ArrayAdapter<String> genderAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,genders);
+		genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		genderSP.setAdapter(genderAdapter);
+		genderSP.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				szGenderSpinnerStr = ("&gender=" + gendersVal[position]);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				szGenderSpinnerStr = ("&gender=1");
+			}
+			
+		});
+		
+		ArrayAdapter<String> permissionAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,permissions);
+		permissionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		permissionSP.setAdapter(permissionAdapter);
+		permissionSP.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				szPermissionSpinnerStr = ("&permission=" + permissionVal[position]);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				szPermissionSpinnerStr = ("&permission=2 ");
+			}
+			
+		});
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(" 新添用户  ")
+		       .setCancelable(false)
+		       .setView(v)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+
+		       		String name=nameET.getText().toString().trim();
+		       		String account=accountET.getText().toString().trim();
+		       		String password=passwordET.getText().toString().trim();
+		       		String remark=remarkET.getText().toString().trim();
+		       		
+		       		if(name.equals("")) {
+		       			Toast.makeText(AdminActivity.this, "用户名不能为空!", Toast.LENGTH_LONG).show();
+		       		}
+		       		else if(account.equals("")) {
+		       			Toast.makeText(AdminActivity.this, "账号不能为空!", Toast.LENGTH_LONG).show();
+		       		}
+		       		else if(password.equals("")) {
+		       			Toast.makeText(AdminActivity.this, "密码不能为空!", Toast.LENGTH_LONG).show();
+		       		}
+		       		else {
+			       		szQueryStr += ("&name="+name+"&account="+account+"&password="+password+"&remark="+remark);
+			       		
+			       		// 开启一个子线程进行服务器访问
+			       		new Thread(new Runnable() {
+	
+			       			@Override
+			       			public void run() {
+			       				// 访问服务器url
+			       				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr+szGenderSpinnerStr+szPermissionSpinnerStr;
+			       				// 获得访问结果
+			       				String result=HttpUtil.queryStringForPost(url);
+			       				
+			       				Message msg = new Message();
+			       		        Bundle data = new Bundle();
+			       		        data.putString("value", result);
+			       		        msg.setData(data);
+			       		        adminHandler.sendMessage(msg);
+			       			}
+			       			
+			       		}).start();
+		       		 }
+		           }
+		       })
+		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	private void getAllUsers() {
+		// 开启一个子线程访问服务器获得当前所有用户
+		Thread thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// 访问服务器url
+				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr=allUserReq";
+   				// 获得访问结果
+   				String result=HttpUtil.queryStringForPost(url);
+   				
+   				szCheckUsersStr=result;
+			}
+			
+		});
+		thread.start();
+		try {
+			thread.join();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	private void getDeleteUserQuery() {
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_delete_user, null);
+		// 获得各个布局实例
+		final ListView usersLV=(ListView) v.findViewById(R.id.admin_delete_user_show_allUsers);
+		final EditText deleteUserNameET=(EditText) v.findViewById(R.id.admin_delete_user_name);
+		
+		Gson gson=new Gson();
+		List<User> userList=new ArrayList<User>();
+		userList = gson.fromJson(szCheckUsersStr, new TypeToken<List<User>>() {  
+        }.getType());
+		
+		MyAdminUserAdapter adpater=new MyAdminUserAdapter(userList,mContext);
+		usersLV.setAdapter(adpater);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("删除用户  ")
+		       .setCancelable(false)
+		       .setView(v)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   
+		        	   String szUserName=deleteUserNameET.getText().toString().trim();
+		        	   
+		        	   if(szUserName.equals("")) {
+		        		   Toast.makeText(AdminActivity.this, "删除用户名不能为空!", Toast.LENGTH_LONG).show();
+		        	   }
+		        	   else {
+			        	   szQueryStr="&name="+szUserName;
+			        	   
+			        	   new Thread(new Runnable() {
+	
+							@Override
+							public void run() {
+								// 访问服务器url
+			       				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr;
+			       				// 获得访问结果
+			       				String result=HttpUtil.queryStringForPost(url);
+			       				
+			       				Message msg = new Message();
+			       		        Bundle data = new Bundle();
+			       		        data.putString("value", result);
+			       		        msg.setData(data);
+			       		        adminHandler.sendMessage(msg);
+							}
+			        		   
+			        	   }).start();
+		        	   }
+		           }
+		       })
+		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	/*
+	private void getAddDishQuery() {
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_add_dish, null); 
+		// 获得各个布局实例
+		final EditText dishNameET=(EditText) v.findViewById(R.id.admin_add_dish_name);
+		final EditText dishTypeET=(EditText) v.findViewById(R.id.admin_add_dish_type);
+		final EditText dishPriceET=(EditText) v.findViewById(R.id.admin_add_dish_price);
+		final EditText dishPicturePathET=(EditText) v.findViewById(R.id.admin_add_dish_picture_path);
+		final EditText dishRemarkET=(EditText) v.findViewById(R.id.admin_add_dish_remark);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(" 新添用户  ")
+		       .setCancelable(false)
+		       .setView(v)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   String dishName=dishNameET.getText().toString().trim();
+		        	   String dishType=dishTypeET.getText().toString().trim();
+		        	   String dishPrice=dishPriceET.getText().toString().trim();
+		        	   String dishPicturePath=dishPicturePathET.getText().toString().trim();
+		        	   String dishRemark=dishRemarkET.getText().toString().trim();
+		        	   
+		        	   if((dishName.equals(""))||(dishType.equals(""))||(dishPrice.equals(""))||(dishPicturePath.equals(""))) {
+		        		   Toast.makeText(AdminActivity.this, "请完善需要添加的菜品信息!", Toast.LENGTH_LONG).show();
+		        	   }
+		        	   else{
+			        	   szQueryStr="&name="+dishName+"&type="+dishType+"&price="+dishPrice+"&picture="+dishPicturePath+"&remark="+dishRemark;
+			        	   
+			        	   // 开启一个子线程访问服务器
+			        	   new Thread(new Runnable() {
+	
+							@Override
+							public void run() {
+								// 访问服务器url
+								String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr;
+								// 返回服务器访问结果
+								String result=HttpUtil.queryStringForPost(url);
+								
+								Message msg = new Message();
+			       		        Bundle data = new Bundle();
+			       		        data.putString("value", result);
+			       		        msg.setData(data);
+			       		        adminHandler.sendMessage(msg);
+							}
+			        		   
+			        	   }).start();
+		        	   }
+			           }
+		       })
+		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	*/
+	
+	private void getAllDishes() {
+		// 开启一个子线程访问服务器获得当前所有用户
+		Thread thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// 访问服务器url
+				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr=allDishesReq";
+   				// 获得访问结果
+   				String result=HttpUtil.queryStringForPost(url);
+   				
+   				szCheckDishesStr=result;
+			}
+			
+		});
+		thread.start();
+		try {
+			thread.join();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private void getDeleteDishQuery() {
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_delete_dish, null);
+		// 获得各个布局实例
+		final ListView dishesLV=(ListView) v.findViewById(R.id.admin_delete_dish_show_allDishes);
+		final EditText deleteDishNameET=(EditText) v.findViewById(R.id.admin_delete_dish_name);
+		
+		Gson gson=new Gson();
+		List<Dishes> dishList=new ArrayList<Dishes>();
+		dishList = gson.fromJson(szCheckDishesStr, new TypeToken<List<Dishes>>() {  
+        }.getType());
+		
+		MyAdminDishAdapter adapter=new MyAdminDishAdapter(dishList,mContext);
+		dishesLV.setAdapter(adapter);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("删除菜品  ")
+		       .setCancelable(false)
+		       .setView(v)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   
+		        	   String szDishName=deleteDishNameET.getText().toString().trim();
+		        	   
+		        	   if(szDishName.equals("")) {
+		        		   Toast.makeText(AdminActivity.this, "请输入需要删除的菜品名!", Toast.LENGTH_LONG).show();
+		        	   }
+		        	   else {
+			        	   szQueryStr="&name="+szDishName;
+			        	   
+			        	   new Thread(new Runnable() {
+	
+							@Override
+							public void run() {
+								// 访问服务器url
+			       				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr;
+			       				// 获得访问结果
+			       				String result=HttpUtil.queryStringForPost(url);
+			       				
+			       				Message msg = new Message();
+			       		        Bundle data = new Bundle();
+			       		        data.putString("value", result);
+			       		        msg.setData(data);
+			       		        adminHandler.sendMessage(msg);
+							}
+			        		   
+			        	   }).start();
+		        	   }
+		           }
+		       })
+		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	private void getUpdateDishesQuery() {
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_update_dish, null);
+		// 获得各个布局实例
+		final ListView updateDishLV=(ListView) v.findViewById(R.id.admin_update_dish_show_allDishes);
+		final EditText updateDishNameET=(EditText) v.findViewById(R.id.admin_update_dish_name);
+		final EditText updateDishPriceET=(EditText) v.findViewById(R.id.admin_update_dish_price);
+		final EditText updateDishRemarkET=(EditText) v.findViewById(R.id.admin_update_dish_remark);
+		
+		Gson gson=new Gson();
+		List<Dishes> dishList=new ArrayList<Dishes>();
+		dishList = gson.fromJson(szCheckDishesStr, new TypeToken<List<Dishes>>() {  
+        }.getType());
+		
+		MyAdminDishAdapter adapter=new MyAdminDishAdapter(dishList,mContext);
+		updateDishLV.setAdapter(adapter);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("更新菜品  ")
+		       .setCancelable(false)
+		       .setView(v)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   
+		        	   String szUpdateDishName=updateDishNameET.getText().toString().trim();
+		        	   String szUpdateDishPrice=updateDishPriceET.getText().toString().trim();
+		        	   String szUpdateDishRemark=updateDishRemarkET.getText().toString().trim();
+		        	   
+		        	   if((szUpdateDishName.equals(""))||(szUpdateDishPrice.equals(""))||(szUpdateDishRemark.equals(""))) {
+		        		   Toast.makeText(AdminActivity.this, "请完善需要更新的菜品信息!", Toast.LENGTH_LONG).show();
+		        	   }
+		        	   else {
+			        	   szQueryStr="&name="+szUpdateDishName+"&price="+szUpdateDishPrice+"&remark="+szUpdateDishRemark;
+			        	   
+			        	   new Thread(new Runnable() {
+
+							@Override
+							public void run() {
+								// 访问服务器url
+			       				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr;
+			       				// 获得访问结果
+			       				String result=HttpUtil.queryStringForPost(url);
+			       				
+			       				Message msg = new Message();
+			       		        Bundle data = new Bundle();
+			       		        data.putString("value", result);
+			       		        msg.setData(data);
+			       		        adminHandler.sendMessage(msg);
+							}
+			        		   
+			        	   }).start();
+		        	   }
+		           }
+		       })
+		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	private void getClearTableQuery() {
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_clear_tables, null);
+		// 获得各个布局实例
+		final EditText tableIdET=(EditText) v.findViewById(R.id.admin_clear_table_tableid);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("清理桌子  ")
+		       .setCancelable(false)
+		       .setView(v)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   String szTableId=tableIdET.getText().toString().trim();
+		        	   
+		        	   if(szTableId.equals("")) {
+		        		   Toast.makeText(AdminActivity.this, "桌子号不能为空!", Toast.LENGTH_LONG).show();
+		        	   }
+		        	   else {
+			        	   szQueryStr="&tableid="+szTableId;
+			        	   
+			        	   new Thread(new Runnable() {
+	
+							@Override
+							public void run() {
+								// 访问服务器url
+			       				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr;
+			       				// 获得访问结果
+			       				String result=HttpUtil.queryStringForPost(url);
+			       				
+			       				Message msg = new Message();
+			       		        Bundle data = new Bundle();
+			       		        data.putString("value", result);
+			       		        msg.setData(data);
+			       		        adminHandler.sendMessage(msg);
+							}
+			        		   
+			        	   }).start();
+		        	   }
+		           }
+		       })
+		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	private void getIsDoneQuery() {
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_dish_is_done, null);
+		// 获得各个布局实例
+		final EditText orderIdET=(EditText) v.findViewById(R.id.admin_dish_is_done_orderid_et);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("结算订单  ")
+		       .setCancelable(false)
+		       .setView(v)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   String szOrderId=orderIdET.getText().toString().trim();
+		        	   
+		        	   if(szOrderId.equals("")) {
+		        		   Toast.makeText(AdminActivity.this, "订单号不能为空!", Toast.LENGTH_LONG).show();
+		        	   }
+		        	   else {
+			        	   szQueryStr="&orderid="+szOrderId;
+			        	   
+			        	   new Thread(new Runnable() {
+	
+							@Override
+							public void run() {
+								// 访问服务器url
+			       				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr;
+			       				// 获得访问结果
+			       				String result=HttpUtil.queryStringForPost(url);
+			       				
+			       				Message msg = new Message();
+			       		        Bundle data = new Bundle();
+			       		        data.putString("value", result);
+			       		        msg.setData(data);
+			       		        adminHandler.sendMessage(msg);
+							}
+			        		   
+			        	   }).start();
+		        	   }
+		           }
+		       })
+		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	private void getListenOrderQuery() {
+		// 开启一个子线程访问服务器
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// 访问服务器url
+				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr;
+				// 返回访问结果
+				String result=HttpUtil.queryStringForPost(url);
+				
+				Message msg = new Message();
+   		        Bundle data = new Bundle();
+   		        data.putString("value", result);
+   		        msg.setData(data);
+   		        checkOrdersHandler.sendMessage(msg);
+			}
+			
+		}).start();
+	}
+	
+	private void getAllPaidOrder() {
+		// 开启一个子线程访问服务器获得当前所有用户
+		Thread thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// 访问服务器url
+				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr=allOrdersReq";
+   				// 获得访问结果
+   				String result=HttpUtil.queryStringForPost(url);
+   				
+   				szCheckOrdersStr=result;
+			}
+			
+		});
+		thread.start();
+		try {
+			thread.join();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private void getDishUpQuery() {
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 获得LinearLayout视图实例
+		View v =inflater.inflate(R.layout.admin_dish_up, null);
+		// 获得各个布局实例
+		final ListView orderInfoLV=(ListView) v.findViewById(R.id.admin_dish_up_show_allOrders);
+		final EditText dishUpOrderIdET=(EditText) v.findViewById(R.id.admin_dish_up_orderid);
+		
+		Gson gson=new Gson();
+		dishUpOrdersList = new ArrayList<DishUpOrders>();
+		dishUpOrdersList = gson.fromJson(szCheckOrdersStr, new TypeToken<List<DishUpOrders>>() {  
+        }.getType());
+		
+		if(null==dishUpOrdersList) {
+			Toast.makeText(AdminActivity.this, "当前没有订单!", Toast.LENGTH_LONG).show();
+		}
+		else {
+			MyAdminOrderDetailAdapter adapter=new MyAdminOrderDetailAdapter(dishUpOrdersList,mContext);
+			orderInfoLV.setAdapter(adapter);
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("确定上菜桌号  ")
+			       .setCancelable(false)
+			       .setView(v)
+			       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			        	   
+			        	   String szDishUpOrderId=dishUpOrderIdET.getText().toString().trim();
+			        	   
+			        	   if(szDishUpOrderId.equals("")) {
+			        		   Toast.makeText(AdminActivity.this, "请输入需要上菜的订单号!", Toast.LENGTH_LONG).show();
+			        	   }
+			        	   else {
+				        	   szQueryStr="&orderid="+szDishUpOrderId;
+				        	   // 开启一个子线程用于更新订单表上菜状态
+				        	   new Thread(new Runnable() {
+		
+								@Override
+								public void run() {
+									// 访问服务器url
+				       				String url=HttpUtil.BASE_URL+"servlet/AdminServlet?requestStr="+szAdminRequestStr+szQueryStr;
+				       				// 获得访问结果
+				       				String result=HttpUtil.queryStringForPost(url);
+				       				
+				       				Message msg = new Message();
+				       		        Bundle data = new Bundle();
+				       		        data.putString("value", result);
+				       		        msg.setData(data);
+				       		        checkOrdersDetailHandler.sendMessage(msg);
+								}
+				        		   
+				        	   }).start();
+			        	   }
+			           }
+			       })
+			       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			                dialog.cancel();
+			           }
+			       });
+			AlertDialog alert = builder.create();
+			alert.show();
+		}
+	}
+	
+	Handler adminHandler=new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+		    Bundle data = msg.getData();
+		    String temp = data.getString("value").toString();
+		    
+		    // 显示结算结果
+			Toast.makeText(AdminActivity.this, temp, Toast.LENGTH_LONG).show();
+		};
+	};
+	Handler checkUsersHandler=new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+		    Bundle data = msg.getData();
+		    String temp = data.getString("value").toString();
+
+			szCheckUsersStr=temp;
+		};
+	};
+	Handler checkOrdersHandler=new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+		    Bundle data = msg.getData();
+		    String temp = data.getString("value").toString();
+		    // 保存从服务器得到的结果信息
+		    String resStr="";
+
+		    Gson gson=new Gson();
+			List<String> orderInfoList=new ArrayList<String>();
+			orderInfoList = gson.fromJson(temp, new TypeToken<List<String>>() {  
+	        }.getType());
+			
+			for(int i=0;i<orderInfoList.size();i++) {
+				resStr += (orderInfoList.get(i)+"                            ");
+			}
+			
+			orderMarqueeET.setText(resStr);
+		};
+	};
+	Handler checkOrdersDetailHandler=new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+		    Bundle data = msg.getData();
+		    String temp = data.getString("value").toString();
+		    
+		    String[] res=temp.split("\\|");
+		    String marqueeStr="";
+		    
+ 			// 跑马灯显示当前上菜订单详情
+ 			int orderid=Integer.parseInt(res[0]);
+ 			marqueeStr += "订单"+orderid+"开始上菜~~ ";
+ 			for(int i=0;i<dishUpOrdersList.size();i++) {
+ 				if(orderid == dishUpOrdersList.get(i).getOrderId()) {
+ 					marqueeStr += (dishUpOrdersList.get(i).getName()+dishUpOrdersList.get(i).getDishNum()+"份~  备注:"+dishUpOrdersList.get(i).getRemark()+"~                ");
+ 				}
+ 			}
+ 			
+ 			orderDetailMarqueeET.setText(marqueeStr);
+		    // 显示结算结果
+ 			Toast.makeText(AdminActivity.this, res[1], Toast.LENGTH_LONG).show();
+		};
+	};
+	
+	// 注销方法
+	private void logout() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("真的要退出系统吗？")
+		       .setCancelable(false)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	  // 确定注销用户时，将本地配置文件中的配置信息重置
+		        	  SharedPreferences pres = getSharedPreferences("config", MODE_PRIVATE);
+		        	  SharedPreferences.Editor editor = pres.edit();
+		        	  
+		        	  editor.putInt("id", 0);
+		        	  editor.putString("name", "");
+		        	  editor.putString("account", "");
+		        	  editor.putString("password", "");
+		        	  editor.putInt("DealedOrderId", 0);
+		        	  editor.putInt("StartedTableId", 0);
+		              editor.commit();
+		        	  
+		        	  Intent intent = new Intent();
+		        	  intent.setClass(AdminActivity.this, LoginActivity.class);
+		        	  startActivity(intent);
+		           }
+		       })
+		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+}

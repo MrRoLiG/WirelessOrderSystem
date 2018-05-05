@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".LoginActivity" >
+   
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:weightSum="20"
+	    android:orientation="vertical"
+	    android:gravity="center"
+	    >
+	    
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	    <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="10"
+	            android:gravity="center"
+	            android:text="@string/activity_login_title"
+	            android:textSize="25dp"
+	            android:layout_marginRight="5dp"
+	            />
+	    </LinearLayout>
+	    
+	    <!-- 账号输入 -->
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	   	    
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:gravity="center"
+	            android:text="@string/activity_login_account"
+	            android:textSize="25dp"
+	            android:layout_marginRight="5dp"
+	            />
+	        
+	        <EditText 
+	            android:id="@+id/login_account"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="7"
+	            android:inputType="text"
+	            android:hint="@string/account_hint"
+	            android:textSize="20dp"/>
+	   	</LinearLayout>
+	   	
+	    <!-- 密码输入 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:gravity="center"
+	            android:text="@string/activity_login_password"
+	            android:textSize="25dp"
+	            android:layout_marginRight="5dp"
+	            />
+	        
+	        <EditText 
+	            android:id="@+id/login_password"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="7"
+	            android:inputType="textPassword"
+	            android:hint="@string/password_hint"
+	            android:textSize="20dp"/>
+	    </LinearLayout>
+	    
+	    <!-- 登录 重置按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <Button 
+	            android:id="@+id/login_ok_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_login_login"
+	            android:textSize="25dp"
+	            android:onClick="onLogin"/>
+	        
+	        <Button 
+	            android:id="@+id/login_reset_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_login_reset"
+	            android:textSize="25dp"
+	            android:onClick="onReset"/>
+	    </LinearLayout>
+	    
+	    <!-- 注册 退出按钮 -->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2.5"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <Button 
+	            android:id="@+id/login_register_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_login_register"
+	            android:textSize="25dp"
+	            android:onClick="onRegister"/>
+	        
+	        <Button 
+	            android:id="@+id/login_exit_btn"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:text="@string/activity_login_exit"
+	            android:textSize="25dp"
+	            android:onClick="onExit"/>
+	    </LinearLayout>
+	    
+	</LinearLayout>   
+   
+</LinearLayout>

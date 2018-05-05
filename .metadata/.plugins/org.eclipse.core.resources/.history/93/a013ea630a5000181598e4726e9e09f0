@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".AddDishActivity" >
+    
+    <LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:weightSum="20"
+	    android:orientation="vertical"
+	    android:gravity="center">
+	    
+	    <!-- 输入布局，输入需要添加菜品的菜名-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:gravity="center"
+	            android:text="@string/activity_add_dish_name"
+	            android:textSize="20dp"
+	            android:layout_marginRight="2.5dp"/>
+	        
+	        <EditText android:id="@+id/admin_add_dish_name"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6"
+	            android:inputType="text"
+	            android:textSize="25dp"/>
+	        
+	    </LinearLayout>
+	    
+	    <!-- 输入布局，输入需要添加菜品的菜系-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:gravity="center"
+	            android:text="@string/activity_add_dish_type"
+	            android:textSize="20dp"
+	            android:layout_marginRight="2.5dp"/>
+	        
+	        <EditText android:id="@+id/admin_add_dish_type"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6"
+	            android:inputType="text"
+	            android:textSize="25dp"/>
+	        
+	    </LinearLayout>
+	    <!-- 输入布局，输入需要添加菜品的价格-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:gravity="center"
+	            android:text="@string/activity_add_dish_price"
+	            android:textSize="20dp"
+	            android:layout_marginRight="2.5dp"/>
+	        
+	        <EditText android:id="@+id/admin_add_dish_price"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6"
+	            android:inputType="text"
+	            android:textSize="25dp"/>
+	        
+	    </LinearLayout>
+	    
+	     <!-- 输入布局，输入需要添加菜品的备注-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:gravity="center"
+	            android:text="@string/activity_add_dish_remark"
+	            android:textSize="20dp"
+	            android:layout_marginRight="2.5dp"/>
+	        
+	        <EditText 
+	            android:id="@+id/admin_add_dish_remark"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6"
+	            android:inputType="text"
+	            android:textSize="25dp"/>
+	        
+	    </LinearLayout>
+	    
+	     <!-- 输入布局，输入需要添加菜品的图片资源路径-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:gravity="center"
+	            android:text="@string/activity_add_dish_picture"
+	            android:textSize="20dp"
+	            android:layout_marginRight="2.5dp"/>
+	        
+	        <EditText 
+	            android:id="@+id/admin_add_dish_picture_path"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="0"
+	            android:inputType="text"
+	            android:textSize="25dp"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_add_dish_upload_pic_btn"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="3"
+	            android:text="@string/activity_add_dish_upload_pic"
+	            android:textSize="15dp"/>
+	        
+	        <Button 
+	            android:id="@+id/admin_add_dish_take_picture_upload"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:text="@string/activity_add_dish_take_picture_upload"
+	            android:layout_weight="3"
+	            android:textSize="15dp"/>
+	        
+	    </LinearLayout>
+	    
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        
+	        
+	        </LinearLayout>
+	    
+	</LinearLayout>
+
+</LinearLayout>

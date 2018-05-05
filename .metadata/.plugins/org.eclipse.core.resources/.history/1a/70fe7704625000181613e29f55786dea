@@ -1,0 +1,771 @@
+package com.amaker.wlo;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.amaker.adapter.MyAddedDishesLVAdapter;
+import com.amaker.provider.Dishes;
+import com.amaker.provider.User;
+import com.amaker.util.CheckDish;
+import com.amaker.util.CheckTable;
+import com.amaker.util.HttpUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+//
+public class OrderActivity extends Activity {
+	// 桌号下拉列表相关控件
+	private Spinner tableNoSpinner;
+	private Button confirmDealBtn;
+	private Button startATableBtn;
+	private Button addDishesBtn;
+	private EditText tableNoCustNumET;
+	private EditText remarkET;
+	
+	// 菜单下拉列表相关控件
+	private Spinner menuSpinner;
+	private EditText dishesNumET;
+	private EditText dishRemarkET;
+	private ImageView dishImageIV;
+	private TextView dishInfoNameTV;
+	private TextView dishInfoPriceTV;
+	private TextView dishInfoTypeTV;
+	private TextView dishInfoRemarkTV;
+	
+	// 点菜确定菜品信息相关控件
+	private ListView addedDishesLV;
+	
+	private static ArrayList<Integer> tableDataList=new ArrayList<Integer>();
+	private ArrayAdapter<Integer> arrTableAdapter;
+	private static ArrayList<String> dishDataList=new ArrayList<String>();
+	private ArrayAdapter<String> arrDishAdapter;
+ 	
+	private ArrayList<CheckTable> checkTableList=new ArrayList<CheckTable>();
+	private static ArrayList<CheckDish> checkDishList=new ArrayList<CheckDish>();
+	private ArrayList<Dishes> dishesListViewList=new ArrayList<Dishes>();
+	
+	private UrlEncodedFormEntity startTableEntity=null;
+	private UrlEncodedFormEntity confirmDealEntity=null;
+	private ArrayList<UrlEncodedFormEntity> entityList=new ArrayList<UrlEncodedFormEntity>();
+
+	private int addedDishIdTemp=0;
+	private String addedDishNameTemp="";
+	
+	private MyAddedDishesLVAdapter addedListViewadapter;
+	// 下单是否成功标志，默认成功
+	private boolean bIsDealSuccess=true;
+	// 下单时所选的菜品种类数
+	private int addedDishesNum=0;
+	// 下单生成订单号,初始值为0
+	private static int nOrderId=0;
+	// 开桌的桌子号
+	private static int nTableId=0;
+	// 开桌的桌子上顾客人数
+	private static int nCustomerNum=0;
+	// 用户是否已经开桌且订单未完成标志位
+	private boolean isOrdered=false;
+	private String checkStr="";
+	
+	private URL getPicURL=null;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_order);
+		
+		confirmDealBtn=(Button)findViewById(R.id.order_confirmDeal_btn);
+		startATableBtn=(Button)findViewById(R.id.order_startATable_btn);
+		addDishesBtn=(Button)findViewById(R.id.order_addDishes_btn);
+		tableNoCustNumET=(EditText)findViewById(R.id.order_tableNo_customerNumber);
+		remarkET=(EditText)findViewById(R.id.order_remark);
+		
+		addedDishesLV=(ListView) findViewById(R.id.added_dishes_lv);
+		
+		// 为确定下单按钮添加点击事件
+		confirmDealBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 遍历点菜列表
+				for(int i=0;i<dishesListViewList.size();i++) {
+					// 先判断此项菜品在下单钱是否确定被选择，即checkBox是否被勾选
+					if(false!=addedListViewadapter.mChecked.get(i)) {
+						// 获得确认所点菜品的信息
+						int dishId=dishesListViewList.get(i).getId();
+						int number=dishesListViewList.get(i).getNumber();
+						String remark=dishesListViewList.get(i).getRemark();
+						int orderId=nOrderId;
+						
+						addedDishesNum++;
+						
+						// 封装到请求参数中
+						List<NameValuePair> params=new ArrayList<NameValuePair>();
+						// 添加到请求参数中去
+						params.add(new BasicNameValuePair("dishId",dishId+""));
+						params.add(new BasicNameValuePair("number",number+""));
+						params.add(new BasicNameValuePair("remark",remark));
+						params.add(new BasicNameValuePair("orderId",orderId+""));
+						// 获取开桌用户
+						SharedPreferences sharedPre = getSharedPreferences("config", MODE_PRIVATE);
+						int nUserId = sharedPre.getInt("id", 0);
+						// 将用户id传过去，以保证回传的的订单号
+						params.add(new BasicNameValuePair("userId",nUserId+""));
+						
+						try {
+							confirmDealEntity=new UrlEncodedFormEntity(params,HTTP.UTF_8);
+							entityList.add(confirmDealEntity);
+						}
+						catch(UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+					}
+					
+				}
+				// 开启一个子线程请求服务器
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						 for(int i=0;i<entityList.size();i++) {
+							// 请求服务器的url
+						 	String url= HttpUtil.BASE_URL+"servlet/OrderServlet?requestStr=confirmDealReq";
+							// 获得HttpPost对象
+							HttpPost request=HttpUtil.getHttpPost(url);
+							// 设置请求参数
+							request.setEntity(entityList.get(i));
+						    // 获得响应结果
+							String result=HttpUtil.queryStringForPost(request);
+							
+							if("0"==result) {
+								bIsDealSuccess=false;
+							}
+						 }
+					}
+					
+				}).start();
+				// 如果下单成功，提示
+				if(true==bIsDealSuccess && 0!=addedDishesNum) {
+					Toast.makeText(OrderActivity.this, "下单成功！", Toast.LENGTH_LONG).show();
+					finish();
+				}
+				else if(true==bIsDealSuccess && 0==addedDishesNum) {
+					showDialog("请至少选择一种菜品确定下单！");
+				}
+				else {
+					showDialog("下单失败，当前未开桌或当前桌不属于您！");
+				}
+				
+			}
+			
+		});
+		
+		// 为添菜按钮添加点击事件
+		addDishesBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 调用点菜方法
+				addDishes();
+			}
+			
+		});
+		
+		// 为开桌按钮添加点击事件
+		startATableBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				
+				// 在开桌之前，访问服务器查询当前用户已经开桌且订单尚未完成
+				Thread thread=new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						// 访问服务器url
+						String url=HttpUtil.BASE_URL+"servlet/MainServlet?requestStr=getUserOrderStateReq"
+								+ "&userid="+getSharedPreferences("config", MODE_PRIVATE).getInt("id", 0);
+						// 获得响应结果
+						String result= HttpUtil.queryStringForPost(url);
+						
+						if(result.equals("0")) {
+							isOrdered=false;
+						}
+						if(!result.equals("0")) {
+							isOrdered=true;
+							checkStr=result;
+						}
+					}
+					
+				});
+				thread.start();
+				try {
+					thread.join();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				
+				if(!isOrdered) {
+					// 获取开桌时间
+					Date date=new Date();
+					SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					String orderDate=sdf.format(date);
+					// 获取开桌用户
+					SharedPreferences sharedPre = getSharedPreferences("config", MODE_PRIVATE);
+					int intUserId = sharedPre.getInt("id", 0);
+					final String userId=intUserId+"";
+					// 获取桌号
+					TextView tv = (TextView) tableNoSpinner.getSelectedView();
+					String tableId = tv.getText().toString().trim();
+					nTableId=Integer.parseInt(tableId);
+					// 获取顾客人数
+					String customerNum=tableNoCustNumET.getText().toString();
+					nCustomerNum=Integer.parseInt(customerNum);
+					
+					// 请求参数列表
+					List<NameValuePair> params = new ArrayList<NameValuePair>();
+					// 添加请求参数
+					params.add(new BasicNameValuePair("userid",userId));
+					params.add(new BasicNameValuePair("tableid",tableId));
+					params.add(new BasicNameValuePair("customernum",customerNum));
+					params.add(new BasicNameValuePair("orderdate",orderDate));
+					
+					try {
+						startTableEntity=new UrlEncodedFormEntity(params,HTTP.UTF_8);
+					}
+					catch(UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					
+					// 开启一个子线程请求服务器
+					new Thread(new Runnable() {
+	
+						@Override
+						public void run() {
+							// 请求服务器url
+							String url = HttpUtil.BASE_URL+"servlet/OrderServlet?requestStr=startTableReq";
+							// 获得请求对象HttpPost
+							HttpPost request = HttpUtil.getHttpPost(url);
+							// 设置查询参数
+							request.setEntity(startTableEntity);
+							// 获得响应结果
+							String result= HttpUtil.queryStringForPost(request);
+							// 点击开桌按钮时记录当前订单号，这里存在一个问题：当客户没有点击开桌时，无法取到订单编号
+							nOrderId=Integer.parseInt(result);
+							// 保存订单Id和桌子Id以及桌子顾客人数到本地配置文件
+							saveOrderIdConfig(nOrderId,nTableId,nCustomerNum);
+							
+							Message msg = new Message();
+					        Bundle data = new Bundle();
+					        data.putString("value", result);
+					        msg.setData(data);
+					        orderSTHandler.sendMessage(msg);
+						}
+						
+					}).start();
+				}
+				else {
+					// 显示结算结果
+					Toast.makeText(OrderActivity.this, "当前用户已开桌且对应订单未完成，请完成之前订单再开桌!订单号为："+checkStr, Toast.LENGTH_LONG).show();
+				}
+			}
+			
+			
+		});
+		
+		tableNoSpinner=(Spinner)findViewById(R.id.order_tableNo_spinner);
+		setTableAdapter();
+		
+		tableNoSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				//	showDialog("Selected!");
+				int sId=tableDataList.get(position);
+				int sFlag=getTableFlagById(sId);
+				confirmDealBtn.setEnabled(true);
+				if(-1==sFlag) {
+					showDialog("该桌号不存在!");
+				}
+				else{
+					if(0==sFlag) {
+						startATableBtn.setEnabled(true);
+						tableNoCustNumET.setText("");
+						remarkET.setText("无");
+						setEditTextReadOnly(tableNoCustNumET,true);
+						setEditTextReadOnly(remarkET,true);
+					}
+					if(1==sFlag) {
+						startATableBtn.setEnabled(false);
+						tableNoCustNumET.setText(getNumById(sId)+"");
+						remarkET.setText(getRemarkById(sId));
+						setEditTextReadOnly(tableNoCustNumET,false);
+						setEditTextReadOnly(remarkET,false);
+					}
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// 不做处理
+			}
+			
+		});
+
+	}
+	
+	// 为桌子号Spinner绑定Adapter
+	private void setTableAdapter() {
+
+		Thread thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					// 访问服务器url
+					String url=HttpUtil.BASE_URL+"servlet/OrderServlet?requestStr=checkTableReq";
+					// 查询返回结果
+					String result=(HttpUtil.queryStringForPost(url)).toString();
+					
+					Gson gson=new Gson();
+					List<CheckTable> tablesList=new ArrayList<CheckTable>();
+					tablesList = gson.fromJson(result, new TypeToken<List<CheckTable>>(){}.getType());
+					
+					for(int i=0;i<tablesList.size();i++) {
+						int id=tablesList.get(i).getId();
+						tableDataList.add(id);
+					}
+					
+					checkTableList=(ArrayList<CheckTable>) tablesList;
+					
+					Message msg = new Message();
+			        Bundle data = new Bundle();
+			        data.putString("value", "tableDataList");
+			        msg.setData(data);
+			        orderHandler.sendMessage(msg);
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
+		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// 点菜方法
+	private void addDishes() {
+		
+		// 获得LayoutInflater实例
+		LayoutInflater inflater = LayoutInflater.from(this);
+		// 实例化需要在对话框中添加的视图
+		final View v=inflater.inflate(R.layout.activity_add_dishes, null);
+		// 获得视图中的Spinner对象
+		menuSpinner = (Spinner) v.findViewById(R.id.choose_dishes_spinner);
+		// 获得视图中的EditText数量对象
+		dishesNumET=(EditText) v.findViewById(R.id.choosed_dish_number);
+		// 获得视图中的EditText备注对象
+		dishRemarkET=(EditText) v.findViewById(R.id.choose_dishes_remark);
+		// 获得视图中的TextView对象用来展示所选菜品信息
+		dishImageIV=(ImageView) v.findViewById(R.id.dishes_info_image_iv);
+		dishInfoNameTV=(TextView) v.findViewById(R.id.dishes_info_name_tv);
+		dishInfoPriceTV=(TextView) v.findViewById(R.id.dishes_info_price_tv);
+		dishInfoRemarkTV=(TextView) v.findViewById(R.id.dishes_info_remark_tv);
+		dishInfoTypeTV=(TextView) v.findViewById(R.id.dishes_info_type_tv);
+		
+		// 开启一个子线程来请求服务器得到菜品信息
+		Thread thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					// 访问服务器url
+					String url=HttpUtil.BASE_URL+"servlet/OrderServlet?requestStr=orderDishesReq";
+					// 查询返回结果
+					String result=(HttpUtil.queryStringForPost(url)).toString();
+					
+					Gson gson=new Gson();
+					List<CheckDish> dishesList=new ArrayList<CheckDish>();
+					dishesList = gson.fromJson(result, new TypeToken<List<CheckDish>>(){}.getType());
+					
+					for(int i=0;i<dishesList.size();i++) {
+						String name=dishesList.get(i).getName();
+						dishDataList.add(name);
+					}
+					
+					checkDishList=(ArrayList<CheckDish>) dishesList;
+					
+					Message msg = new Message();
+			        Bundle data = new Bundle();
+			        data.putString("value", "dishDataList");
+			        msg.setData(data);
+			        addDishHandler.sendMessage(msg);
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
+		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		// 为menuSpinner绑定点击事件
+		menuSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				// 当选中一项菜品的时候，关于改菜品的相关信息会显示在视图中
+				String szName=dishDataList.get(position);
+				addedDishNameTemp=szName;
+				int dishId=getDishIdByName(addedDishNameTemp);
+				addedDishIdTemp=dishId;
+				if(dishId<=0) {
+					showDialog("该菜品不存在！");
+				}
+				else {
+					setImageByDishId(dishId);
+					
+					dishInfoNameTV.setText("菜名："+szName);
+					dishInfoPriceTV.setText("价格："+getDishPriceById(dishId));
+					dishInfoTypeTV.setText("菜系："+getDishTypeById(dishId));
+					dishInfoRemarkTV.setText("介绍："+getDishRemarkById(dishId));
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// 不做处理
+			}
+			
+		});
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("请点菜：").setView(v)
+		.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// 将添加的菜品保存起来以便后面下单时结算和生成订单
+				String name=addedDishNameTemp.toString();
+				String remark="备注："+dishRemarkET.getText().toString();
+				
+				// 定义一个标志位表示当前添加的菜品是否重复
+				boolean isRepeat=false;
+				
+				// TODO
+				// 先判断添加的菜品之前是否添加过，如果添加过，更新数量，否则新添菜品
+				for(int i=0;i<dishesListViewList.size();i++) {
+					if(addedDishIdTemp==dishesListViewList.get(i).getId()) {
+						isRepeat=true;
+						// 更新数量
+						int nNum=dishesListViewList.get(i).getNumber()+Integer.parseInt(dishesNumET.getText().toString());
+						dishesListViewList.get(i).setNumber(nNum);
+						
+						break;
+					}
+				}
+				
+				if(!isRepeat) {
+					Dishes dish=new Dishes();
+					dish.setId(addedDishIdTemp);
+					dish.setName(name);
+					dish.setPrice(getDishPriceById(addedDishIdTemp));
+					dish.setNumber(Integer.parseInt(dishesNumET.getText().toString()));
+					dish.setRemark(remark);
+					
+					dishesListViewList.add(dish);
+				}
+				// 为点菜ListView绑定Adapter
+				addedListViewadapter=new MyAddedDishesLVAdapter(dishesListViewList,getApplication());
+				addedDishesLV.setAdapter(addedListViewadapter);
+			}
+		}).setNegativeButton("取消", null);
+		AlertDialog alert=builder.create();
+		alert.show();
+	}
+	
+	Handler orderHandler=new Handler() {
+		@Override
+	    public void handleMessage(Message msg) {
+	        super.handleMessage(msg);
+	        Bundle data = msg.getData();
+	        String temp = data.getString("value").toString();
+	        
+	        arrTableAdapter=new ArrayAdapter<Integer>(OrderActivity.this,android.R.layout.simple_spinner_item,tableDataList);
+	        arrTableAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			tableNoSpinner.setAdapter(arrTableAdapter);
+	    }
+	};
+	Handler orderSTHandler=new Handler() {
+
+		@Override
+	    public void handleMessage(Message msg) {
+	        super.handleMessage(msg);
+	        Bundle data = msg.getData();
+	        String temp = data.getString("value").toString();
+
+			showDialog("开桌成功！订单号："+temp.toString()+"！");
+			startATableBtn.setEnabled(false);
+	    }
+	};
+	Handler addDishHandler=new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+	        Bundle data = msg.getData();
+	        String temp = data.getString("value").toString();
+	        
+	        arrDishAdapter=new ArrayAdapter<String>(OrderActivity.this,android.R.layout.simple_spinner_item,dishDataList);
+	        arrDishAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	        menuSpinner.setAdapter(arrDishAdapter);
+		};
+	};
+	
+	// 通过桌子id获取桌子的状态
+	private int getTableFlagById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getFlag();
+			}
+		}
+		return -1;
+	}
+	// 通过桌子id获取桌子人数
+	private int getNumById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getCustomerNum();
+			}
+		}
+		return 0;
+	}
+	// 通过桌子号获取桌子的remark
+	private String getRemarkById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getRemark();
+			}
+		}
+		return "无";
+	}
+	
+	// 通过菜品名得到菜品id
+	private int getDishIdByName(String name) {
+		for(int i=0;i<checkDishList.size();i++) {
+			if(name.equals(checkDishList.get(i).getName())) {
+				return checkDishList.get(i).getId();
+			}
+		}
+		return -1;
+	}
+	// 通过菜品id获得该菜品菜系
+	private String getDishTypeById(int id) {
+		for(int i=0;i<checkDishList.size();i++) {
+			if(id==checkDishList.get(i).getId()) {
+				return checkDishList.get(i).getType();
+			}
+		}
+		return null;
+	}
+	// 通过菜品id获得菜品价格
+	private int getDishPriceById(int id) {
+		for(int i=0;i<checkDishList.size();i++) {
+			if(id==checkDishList.get(i).getId()) {
+				return checkDishList.get(i).getPrice();
+			}
+		}
+		return 0;
+	}
+	// 通过菜品id获得该菜品介绍
+	private String getDishRemarkById(int id) {
+		for(int i=0;i<checkDishList.size();i++) {
+			if(id==checkDishList.get(i).getId()) {
+				return checkDishList.get(i).getRemark();
+			}
+		}
+		return null;
+	}
+	// 通过菜品id获得该菜品对应图片资源url路径
+	private String getURLPathById(int id)
+	{
+		for(int i=0;i<checkDishList.size();i++) {
+			if(id==checkDishList.get(i).getId()) {
+				return checkDishList.get(i).getPicture();
+			}
+		}
+		return null;
+	}
+	
+	// 通过URL访问服务器得到对应的图片资源
+	private void showDishPictrue(final String url)
+	{
+		//从服务器下载图片
+		Thread thread=new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					getPicURL=new URL(url);
+				}
+				catch(MalformedURLException e)
+				{
+					e.printStackTrace();
+				}
+				try {
+					HttpURLConnection conn=(HttpURLConnection) getPicURL.openConnection();
+					conn.setDoInput(true);
+					conn.connect();
+					InputStream is=conn.getInputStream();
+					picBitmap = BitmapFactory.decodeStream(is);
+					is.close();
+					
+					Message msg=new Message();
+					Bundle data=new Bundle();
+					data.putString("value", "success");
+					msg.setData(data);
+					picHandler.sendMessage(msg);
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+				
+			}});
+		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	// 设置输入框只读
+	public void setEditTextReadOnly(TextView view,boolean isReadOnly){ 
+      if (view instanceof android.widget.EditText){    
+          view.setCursorVisible(isReadOnly);      //设置输入框中的光标不可见    
+          view.setFocusable(isReadOnly);           //无焦点    
+          view.setFocusableInTouchMode(isReadOnly);     //触摸时也得不到焦点    
+      }    
+	}  
+	// 显示对话框函数
+	private void showDialog(String msg){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(msg)
+		       .setCancelable(false)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	// 保存当前订单号，桌子号，顾客人数到本地配置文件
+	private void saveOrderIdConfig(int orderid,int tableid,int customernum) {
+		// 获取SharedPreferences对象
+        SharedPreferences sharedPre=getSharedPreferences("config", MODE_PRIVATE);
+        // 获取Editor对象
+        Editor editor=sharedPre.edit();
+        // 保存参数
+        editor.putInt("DealedOrderId", orderid);
+        editor.putInt("StartedTableId", tableid);
+        editor.putInt("StartedCusNum", customernum);
+        // 提交
+        editor.commit();
+	}
+	
+	// 根据dishId设置菜品图片
+	private void setImageByDishId(int dishid) {
+		switch(dishid){
+			case 1:
+				dishImageIV.setImageResource(R.drawable.dish_1);
+				break;
+			case 2:
+				dishImageIV.setImageResource(R.drawable.dish_2);
+				break;
+			case 3:
+				dishImageIV.setImageResource(R.drawable.dish_3);
+				break;
+			case 4:
+				dishImageIV.setImageResource(R.drawable.dish_4);
+				break;
+			case 5:
+				dishImageIV.setImageResource(R.drawable.dish_5);
+				break;
+			case 6:
+				dishImageIV.setImageResource(R.drawable.dish_6);
+				break;
+			case 7:
+				dishImageIV.setImageResource(R.drawable.dish_7);
+				break;
+			case 8:
+				dishImageIV.setImageResource(R.drawable.dish_8);
+				break;
+			default:
+				break;
+		}
+	}
+}

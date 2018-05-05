@@ -1,0 +1,8 @@
+package com.amaker.servlet;
+
+import javax.servlet.http.HttpServlet;
+
+public class OrderDishesServlet extends HttpServlet{
+	private static final long serialVersionUID = 1L;
+
+}

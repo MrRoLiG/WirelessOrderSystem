@@ -1,0 +1,10 @@
+package com.amaker.dao;
+
+import java.util.List;
+
+//OrderDao的接口
+public interface OrderDao {
+	
+	//得到菜单列表
+	public List getDishesList();
+}

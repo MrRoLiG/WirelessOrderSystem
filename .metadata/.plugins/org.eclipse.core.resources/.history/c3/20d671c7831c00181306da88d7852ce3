@@ -1,0 +1,7 @@
+package com.amaker.dao;
+
+//OrderDaoµÄ½Ó¿Ú
+public class OrderDao {
+	
+	//
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;Wireless_Order_Server/WebContent/temp&apos; to &apos;uploads&apos;" description="Rename resource &apos;temp&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="WebContent/temp" name="uploads" stamp="1525434596437" updateReferences="true"/>
+</session>

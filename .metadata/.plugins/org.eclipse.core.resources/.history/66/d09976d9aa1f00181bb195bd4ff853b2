@@ -1,0 +1,310 @@
+package com.amaker.wlo;
+
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.amaker.util.CheckTable;
+import com.amaker.util.HttpUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+public class OrderActivity extends Activity {
+	
+	private Spinner tableNoSpinner;
+	private Button confirmDealBtn;
+	private Button startATableBtn;
+	private Button addDishesBtn;
+	private EditText tableNoCustNumET;
+	private EditText remarkET;
+	
+	private ArrayList<Integer> dataList=new ArrayList<Integer>();
+	private ArrayAdapter<Integer> arrAdapter;
+	
+	private ArrayList<CheckTable> checkTableList=new ArrayList<CheckTable>();
+	
+	UrlEncodedFormEntity entity=null;
+	// 开桌生成的订单id
+	private String szOrderId;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_order);
+		
+		confirmDealBtn=(Button)findViewById(R.id.order_confirmDeal_btn);
+		startATableBtn=(Button)findViewById(R.id.order_startATable_btn);
+		addDishesBtn=(Button)findViewById(R.id.order_addDishes_btn);
+		tableNoCustNumET=(EditText)findViewById(R.id.order_tableNo_customerNumber);
+		remarkET=(EditText)findViewById(R.id.order_remark);
+		
+		// 为确定下单按钮添加点击事件
+		confirmDealBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		// 为添菜按钮添加点击事件
+		addDishesBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		// 为开桌按钮添加点击事件
+		startATableBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 获取开桌时间
+				Date date=new Date();
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+				String orderDate=sdf.format(date);
+				// 获取开桌用户
+				SharedPreferences sharedPre = getSharedPreferences("config", MODE_PRIVATE);
+				int intUserId = sharedPre.getInt("id", 0);
+				String userId=intUserId+"";
+				// 获取桌号
+				TextView tv = (TextView) tableNoSpinner.getSelectedView();
+				String tableId = tv.getText().toString();
+				
+				JSONObject jsonOB =(JSONObject) tableNoSpinner.getSelectedItem();
+				try {
+					if(1==jsonOB.getInt("flag")) {
+						showDialog("该桌子已经开桌，不能继续！");
+					}
+				}
+				catch(JSONException e) {
+					e.printStackTrace();
+				}
+				// 获取顾客人数
+				String customerNum=tableNoCustNumET.getText().toString();
+				
+				// 请求参数列表
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				// 添加请求参数
+				params.add(new BasicNameValuePair("userid",userId));
+				params.add(new BasicNameValuePair("tableid",tableId));
+				params.add(new BasicNameValuePair("customernum",customerNum));
+				params.add(new BasicNameValuePair("orderdate",orderDate));
+				
+				try {
+					entity=new UrlEncodedFormEntity(params,HTTP.UTF_8);
+				}
+				catch(UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+				
+				// 开启一个子线程请求服务器
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						// 请求服务器url
+						String url = HttpUtil.BASE_URL+"servlet/StartTableServlet";
+						// 获得请求对象HttpPost
+						HttpPost request = HttpUtil.getHttpPost(url);
+						// 设置查询参数
+						request.setEntity(entity);
+						// 获得响应结果
+						String result= HttpUtil.queryStringForPost(request);
+						
+						szOrderId=result;
+						showDialog("订单号："+szOrderId.toString());
+						startATableBtn.setEnabled(false);
+					}
+					
+				}).start();
+			}
+			
+		});
+		
+		tableNoSpinner=(Spinner)findViewById(R.id.order_tableNo_spinner);
+		setTableAdapter();
+		
+		tableNoSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				// TODO Auto-generated method stub
+				//	showDialog("Selected!");
+				int sId=dataList.get(position);
+				int sFlag=getTableFlagById(sId);
+				confirmDealBtn.setEnabled(true);
+				if(-1==sFlag) {
+					showDialog("该桌号不存在!");
+				}
+				else{
+					if(0==sFlag) {
+						startATableBtn.setEnabled(true);
+						tableNoCustNumET.setText("0");
+						remarkET.setText("无");
+						setEditTextReadOnly(tableNoCustNumET,true);
+						setEditTextReadOnly(remarkET,true);
+					}
+					if(1==sFlag) {
+						startATableBtn.setEnabled(false);
+						tableNoCustNumET.setText(getNumById(sId)+"");
+						remarkET.setText(getRemarkById(sId));
+						setEditTextReadOnly(tableNoCustNumET,false);
+						setEditTextReadOnly(remarkET,false);
+					}
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+				// showDialog("NotSelected!");
+			}
+			
+		});
+
+		
+	}
+	
+	private void setTableAdapter() {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					// 访问服务器url
+					String url=HttpUtil.BASE_URL+"servlet/CheckTableServlet";
+					// 查询返回结果
+					String result=(HttpUtil.queryStringForPost(url)).toString();
+					
+					JsonParser parser=new JsonParser();
+					JsonArray jsonArr=parser.parse(result).getAsJsonArray();		
+					Gson gson=new Gson();
+					
+					for(JsonElement jsonTable:jsonArr) {
+						CheckTable checkTable=gson.fromJson(jsonTable, CheckTable.class);
+						checkTableList.add(checkTable);
+					}
+					for(int i=0;i<checkTableList.size();i++) {
+						int id=checkTableList.get(i).getId();
+						dataList.add(id);
+					}
+					
+					Message msg = new Message();
+			        Bundle data = new Bundle();
+			        data.putString("value", dataList.toString());
+			        msg.setData(data);
+			        orderHandler.sendMessage(msg);
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}).start();
+	}
+	
+	Handler orderHandler=new Handler() {
+		@Override
+	    public void handleMessage(Message msg) {
+	        super.handleMessage(msg);
+	        Bundle data = msg.getData();
+	        String temp = data.getString("value").toString();
+	        String str=temp.substring(1,temp.length()-1);
+	        ArrayList val = new ArrayList(Arrays.asList(str.split(",")));
+	        
+	        arrAdapter=new ArrayAdapter<Integer>(OrderActivity.this,android.R.layout.simple_spinner_item,val);
+			arrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			tableNoSpinner.setAdapter(arrAdapter);
+	    }
+	};
+	
+	
+	// 通过桌子id获取桌子的状态
+	private int getTableFlagById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getFlag();
+			}
+		}
+		return -1;
+	}
+	// 通过桌子id获取桌子人数
+	private int getNumById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getCustomerNum();
+			}
+		}
+		return 0;
+	}
+	// 通过桌子号获取桌子的remark
+	private String getRemarkById(int id) {
+		for(int i=0;i<checkTableList.size();i++) {
+			if(id==checkTableList.get(i).getId()) {
+				return checkTableList.get(i).getRemark();
+			}
+		}
+		return "无";
+	}
+	
+	// 设置输入框只读
+	public void setEditTextReadOnly(TextView view,boolean isReadOnly){ 
+      if (view instanceof android.widget.EditText){    
+          view.setCursorVisible(isReadOnly);      //设置输入框中的光标不可见    
+          view.setFocusable(isReadOnly);           //无焦点    
+          view.setFocusableInTouchMode(isReadOnly);     //触摸时也得不到焦点    
+      }    
+	}  
+	
+	//显示对话框函数
+	private void showDialog(String msg){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(msg)
+		       .setCancelable(false)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+}

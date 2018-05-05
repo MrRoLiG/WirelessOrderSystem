@@ -1,0 +1,176 @@
+package com.amaker.wlo;
+
+import com.amaker.provider.User;
+import com.amaker.util.HttpUtil;
+import com.google.gson.Gson;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+
+public class LoginActivity extends Activity {
+	
+	private Button loginBtn,resetBtn,exitBtn,registerBtn;
+	private EditText userEditText,pwdEditText;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		//setTitle("Login");
+		setContentView(R.layout.activity_login);
+		
+		//获得各个按键组件
+		loginBtn=(Button)findViewById(R.id.login_ok_btn);
+		resetBtn=(Button)findViewById(R.id.login_reset_btn);
+		exitBtn=(Button)findViewById(R.id.login_exit_btn);
+		registerBtn=(Button)findViewById(R.id.login_register_btn);
+		
+		//获得输入框组件
+		userEditText=(EditText)findViewById(R.id.login_account);
+		pwdEditText=(EditText)findViewById(R.id.login_password);
+		
+		//为各个按键添加点击事件
+		loginBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if(validate()) {
+					new Thread(new Runnable() {
+						//开启子线程进行登录操作
+						@Override
+						public void run() {
+							try {
+								String username=userEditText.getText().toString();
+								String password=pwdEditText.getText().toString();
+								
+								String queryStr="account="+username+"&password="+password;
+								String url=HttpUtil.BASE_URL+"servlet/LoginServlet?"+queryStr;
+								
+								String resQuery=HttpUtil.queryStringForPost(url);
+								
+								Message msg = new Message();
+						        Bundle data = new Bundle();
+						        data.putString("value", resQuery);
+						        msg.setData(data);
+						        loginHandler.sendMessage(msg);
+							}
+							catch(Exception e) {
+								e.printStackTrace();
+							}
+						}
+						
+					}).start();
+				}
+				
+			}
+		});
+		
+		resetBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				userEditText.setText("");
+				pwdEditText.setText("");
+			}
+			
+		});
+		exitBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				android.os.Process.killProcess(android.os.Process.myPid());     //获取PID 
+				System.exit(0);   												//常规java的标准退出法，返回值为0代表正常退出
+			}
+			
+		});
+		registerBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
+				startActivity(intent);
+			}
+			
+		});
+		
+	}
+	
+	Handler loginHandler=new Handler() {
+		@Override
+	    public void handleMessage(Message msg) {
+	        super.handleMessage(msg);
+	        Bundle data = msg.getData();
+	        String val = data.getString("value");
+	        
+	        if(null!=val&&val.equals("0")) {
+	        	showDialog("用户不存在或者用户输入有误！");
+			}
+			else {
+				System.out.println("LOGIN SUCCESSFUL.......................");
+				//showDialog("登陆成功！");
+				// 保存用户登录配置信息
+				//saveUserMsg(val);
+				Gson gson=new Gson();
+				User user=gson.fromJson(val, User.class);
+				Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+				startActivity(intent);
+			}
+	    }
+	};
+	
+	//验证输入框内容函数
+	private boolean validate() {
+		String username=userEditText.getText().toString();
+		if(username.equals("")) {
+			showDialog("用户账号不能为空！");
+			return false;
+		}
+		String password=pwdEditText.getText().toString();
+		if(password.equals("")) {
+			showDialog("密码不能为空！");
+			return false;
+		}
+		return true;
+	}
+	//显示对话框函数
+	private void showDialog(String msg){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(msg)
+		       .setCancelable(false)
+		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	//将用户信息保存到配置文件
+	private void saveUserMsg(String msg) {
+		// 用户id
+		String id="";
+		// 用户名
+		String name="";		
+		// 获得信息数组
+		String[] msgs=msg.split(";");
+		int index=msgs[0].indexOf("=");
+		id=msgs[0].substring(index+1);
+		index=msgs[1].indexOf("=");
+		name=msgs[1].substring(index+1);
+		// 共享信息
+		SharedPreferences sp = getSharedPreferences("user_msg", MODE_WORLD_WRITEABLE);
+		SharedPreferences.Editor editor = sp.edit();
+		
+		editor.putString("id", id);
+		editor.putString("name", name);
+		editor.commit();
+	}
+}

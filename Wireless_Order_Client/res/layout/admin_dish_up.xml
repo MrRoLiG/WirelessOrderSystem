@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center" >
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:weightSum="20"
+	    android:orientation="vertical"
+	    android:gravity="center">
+	    
+        <!-- 显示当前所有订单ListView -->
+        <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="10"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+            <ListView 
+	            android:id="@+id/admin_dish_up_show_allOrders"
+	            android:layout_width="match_parent"
+		        android:layout_height="match_parent"
+		        android:layout_margin="8dp"
+		        android:orientation="horizontal"
+		        android:weightSum="10"
+		        android:gravity="center">
+        	</ListView>
+        	
+	    </LinearLayout>
+        
+        
+        <!-- 输入布局，输入需要上菜的订单号-->
+	    <LinearLayout 
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="2"
+	        android:layout_margin="8dp"
+	        android:orientation="horizontal"
+	        android:weightSum="10"
+	        android:gravity="center">
+	        
+	        <TextView 
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="4"
+	            android:gravity="center"
+	            android:text="@string/activity_dish_up_tableid"
+	            android:textSize="15dp"
+	            android:layout_marginRight="2.5dp"/>
+	        
+	        <EditText android:id="@+id/admin_dish_up_orderid"
+                android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="6"
+	            android:inputType="text"
+	            android:textSize="25dp"/>
+	        
+	    </LinearLayout>
+        
+    </LinearLayout>
+
+</LinearLayout>

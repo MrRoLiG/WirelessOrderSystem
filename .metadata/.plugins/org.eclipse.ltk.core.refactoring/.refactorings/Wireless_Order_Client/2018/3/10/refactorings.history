@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;Wireless_Order_Client/res/layout/dishes_list_item.xml&apos; to &apos;activity_add_dishes.xml&apos;" description="Rename resource &apos;dishes_list_item.xml&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="res/layout/dishes_list_item.xml" name="activity_add_dishes.xml" stamp="1520673688763" updateReferences="true"/>
+</session>

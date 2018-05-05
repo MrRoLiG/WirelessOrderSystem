@@ -1,0 +1,7 @@
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=win32
+configDescList=org.eclipse.launchbar.core.descriptorType.default\:Wireless_Order_Client (1),org.eclipse.launchbar.core.descriptorType.default\:Tomcat v7.0 Server at localhost,org.eclipse.launchbar.core.descriptorType.default\:Wireless_Order_Client
+eclipse.preferences.version=1
+org.eclipse.launchbar.core.descriptorType.default\:Tomcat\ v7.0\ Server\ at\ localhost/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:Tomcat\ v7.0\ Server\ at\ localhost/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
+org.eclipse.launchbar.core.descriptorType.default\:Wireless_Order_Client/activeLaunchMode=run
