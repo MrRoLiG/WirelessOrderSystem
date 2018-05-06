@@ -16,7 +16,7 @@ import com.mysql.jdbc.PreparedStatement;
 public class PayDaoImpl implements PayDao{
 
 	@Override
-	public List getOrderDetailList(int orderid) {
+	public List<QueryOrderDetail> getOrderDetailList(int orderid) {
 		// ≤È—Øsql”Ôæ‰
 		String sql="select dt.id ,dt.name, dt.price, odt.dishnum, dt.price*odt.dishnum as totalcost, odt.remark from wireless_db.orderdetailtbl as odt left join wireless_db.dishestbl as dt "
 				+ "on odt.dishid = dt.id where odt.orderid= ? ";

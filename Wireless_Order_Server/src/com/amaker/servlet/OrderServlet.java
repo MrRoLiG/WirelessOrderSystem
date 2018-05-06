@@ -18,6 +18,7 @@ import com.amaker.dao.impl.TableDaoImpl;
 import com.amaker.entity.Order;
 import com.amaker.entity.OrderDetail;
 import com.amaker.entity.QueryOrder;
+import com.amaker.entity.QueryOrderDetail;
 import com.google.gson.Gson;
 
 public class OrderServlet extends HttpServlet{
@@ -122,7 +123,8 @@ public class OrderServlet extends HttpServlet{
 				// 查询订单信息
 				QueryOrder queryOrder=payDao.getOrderById(orderid);
 				// 查询订单详情表
-				List list=payDao.getOrderDetailList(orderid);
+				@SuppressWarnings("unchecked") 
+				List<QueryOrderDetail> list=payDao.getOrderDetailList(orderid);
 				
 				System.out.println("REQUEST PAY............................................");
 				

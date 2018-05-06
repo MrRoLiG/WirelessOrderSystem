@@ -3,11 +3,7 @@ package com.amaker.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Properties;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 //数据库工具类
 public class DBUtil {
@@ -28,7 +24,7 @@ public class DBUtil {
 			password=prop.getProperty("password");
 			
 			Class.forName(driver);
-			System.out.println("CONNECTION OPENED。....................");
+			System.out.println("MySQL　DATABASE　CONNECTION OPENED。....................");
 			return DriverManager.getConnection(url,username,password);
 		}
 		catch(Exception e) {
@@ -42,19 +38,10 @@ public class DBUtil {
 	public void closeConnection(Connection conn) {
 		try {
 			conn.close();
-			System.out.println("CONNECTION CLOSED....................");
+			System.out.println("MySQL　DATABASE　CONNECTION CLOSED....................");
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	//信息列表转换为字符串
-	public static String buildJson(List list) {
-		JSONArray array =new JSONArray();
-		for(Object o:list) {
-			array.add(JSONObject.fromObject(o));
-		}
-		return array.toString();
 	}
 }

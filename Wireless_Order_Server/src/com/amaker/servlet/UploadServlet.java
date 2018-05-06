@@ -45,7 +45,6 @@ public class UploadServlet extends HttpServlet{
 				DiskFileItemFactory factory = new DiskFileItemFactory();
 
 				// 设置文件上传路径
-				//String upload = this.getServletContext().getRealPath("/");
 				String upload="C:/Users/DELL/Desktop/Test/MyServerAndClient/Wireless_Order_Server/WebContent/uploads";
 				String path="";
 				String urlPath="http://10.0.3.2:8080/Wireless_Order_Server/uploads/";
@@ -62,6 +61,7 @@ public class UploadServlet extends HttpServlet{
 
 				// 解析结果放在List中
 				try {
+					@SuppressWarnings("unchecked")
 					List<FileItem> list = servletFileUpload.parseRequest(request);
 
 					for (FileItem item : list) {
